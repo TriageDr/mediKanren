@@ -6,14 +6,17 @@
 #|--- PMI-CASE-REGISTRY INPUT ---|#
 (time
  (define pmi-ls
-   '(PMI-18-153))
- 
+   '(PMI-18-137
+     PMI-18-137))
+
  (define sym-hgnc-ls
-   '(KCNN3))
+   '(SMN1
+     SMN2))
 
  (define hgnc-id-ls/num
    (map number->string
-	'(6292)))
+	'(11117
+	  11118)))
 
  (define hgnc-id-ls
    (map (lambda (ls)
@@ -178,10 +181,10 @@
     (cond
       ((null? ls) els)
       ((or (void? (car ls))
-	   (regexp-match #rx"^UMLS:C0017337$" (car ls))
-	   (regexp-match #rx"^Genes$" (car ls))
-	   (regexp-match #rx":[Nn][Oo][Cc][Oo][Dd][Ee]" (car ls))
-	   (number? (car ls)))
+	   #|(regexp-match #rx"^UMLS:C0017337$" (car ls))
+	   (regexp-match #rx"^Genes$" (car ls))|#
+	   #|(regexp-match #rx":[Nn][Oo][Cc][Oo][Dd][Ee]" (car ls))|#
+	   #|(number? (car ls))|#)
        (prune-xrefs (cdr ls) els))
       ((string-contains? (car ls) "NCBI")
        (prune-xrefs (cdr ls)
@@ -347,10 +350,10 @@
        (fprintf port "~a~c" (car headers) #\tab)
        (export-column-headers (cdr headers) port)))))
 
-#|
+
 (define export-path
-  "/home/mjpatton/PhD/CaseReviews/case_registry/queries/test/")
-|#
+  "/home/mjpatton/PhD/CaseReviews/18_137_PMICase/")
+
 
 (newline)
 (displayln "HELPER-FUNCTIONS LOADED, BEGINNING GENE-CONCEPT BUILDING")
@@ -369,8 +372,8 @@
 (define handle
   (time
    (lambda (pmi-ls hgnc-id-ls sym-hgnc-ls)
-     (let* ((export-path
-	     (path->string (find-system-path 'desk-dir)))
+     (let* (#|(export-path
+	     (path->string (find-system-path 'desk-dir)))|#
 	    (all-downregulator/path
 	     (format
 	      "~a~a_all_drug_downregulators_for_~a.tsv" export-path pmi-ls sym-hgnc-ls))
@@ -1260,136 +1263,275 @@ list of fibrosarcoma concepts
 ;;gene-list RC
 (define hgnc-id-ls/num
   (map number->string
-       '(38
-	 14899
-	 943
-	 320
-	 19990
-	 489
-	 490
-	 2013
-	 638
-	 14103
-	 15607
-	 14872
-	 974
-	 24176
-	 14343
-	 1325
-	 1389
-	 1537
-	 26295
-	 1705
-	 20455
-	 2174
-	 2191
-	 22990
-	 2333
-	 24292
-	 2498
-	 2530
-	 20348
-	 2907
-	 2908
-	 2926
-	 3010
-	 3016
-	 32188
-	 19087
-	 3154
-	 27234
-	 27683
-	 30114
-	 34236
-	 3603
-	 13590
-	 3761
-	 3800
-	 3801
-	 3817
-	 25491
-	 4092
-	 4122
-	 4131
-	 4882
-	 5141
-	 17087
-	 5466
-	 25251
-	 23236
-	 48664
-	 6617
-	 6664
-	 16895
-	 17200
-	 14575
-	 17082
-	 7159
-	 7171
-	 7514
-	 7614
-	 29832
-	 13395
-	 7746
-	 7775
-	 16191
-	 19321
-	 27106
-	 7909
-	 41983
-	 7952
-	 8126
-	 8134
-	 19316
-	 8604
-	 17270
-	 16068
-	 14180
-	 27559
-	 8890
-	 8906
-	 30065
-	 19255
-	 29037
-	 14683
-	 26303
-	 20331
-	 688
-	 20457
-	 13441
-	 13655
-	 24188
-	 32455
-	 18386
-	 18387
-	 10798
-	 10799
-	 10801
-	 10802
-	 10803
-	 16192
-	 11046
-	 11049
-	 11073
-	 16698
-	 15592
-	 18065
-	 15885
-	 11568
-	 11581
-	 11595
-	 20329
-	 27916
-	 11950
-	 30887
-	 20670
-	 29315
-	 15466
-	 12769
-	 19221
-	 16804
-	 13083
-	 )))
+'(38
+14899
+943
+320
+
+19990
+489
+490
+2013
+638
+14103
+15607
+14872
+974
+24176
+14343
+1325
+1389
+1537
+26295
+1705
+20455
+2174
+2191
+22990
+2333
+24292
+2498
+2530
+20348
+2907
+2908
+2926
+3010
+3016
+32188
+19087
+3154
+27234
+27683
+30114
+34236
+3603
+13590
+
+3761
+3800
+3801
+3817
+25491
+4092
+4122
+4131
+4882
+5141
+17087
+5466
+25251
+23236
+48664
+6617
+6664
+16895
+17200
+14575
+17082
+7159
+7171
+7514
+7614
+29832
+13395
+7746
+7775
+16191
+19321
+27106
+7909
+41983
+7952
+8126
+8134
+19316
+8604
+17270
+16068
+14180
+27559
+8890
+8906
+30065
+19255
+29037
+14683
+
+26303
+20331
+688
+20457
+13441
+13655
+24188
+32455
+18386
+18387
+10798
+10799
+10801
+10802
+10803
+16192
+11046
+11049
+11073
+16698
+15592
+18065
+15885
+11568
+11581
+11595
+20329
+27916
+11950
+30887
+20670
+29315
+15466
+12769
+19221
+16804
+13083
+)))
+       
+
+(define hgnc-sym-ls
+'(ABCA8
+ADAMTS14
+ADGRB1
+AGER
+ENSG00000257310
+ANAPC4
+ANGPTL1
+ANGPTL2
+AP3S1
+AQP5
+ARHGEF10
+ARHGEF7
+ASPN
+BCAS1
+BTNL9
+C1QTNF6
+C4BPA
+CACNA1B
+CBFA2T3
+CCDC102B
+CD86
+CHFR
+CNTN4
+COL14A1
+COL23A1
+CPZ
+CSGALNACT2
+CTDP1
+CTSE
+DIO3OS
+DLK1
+DLL1
+DMBT1
+DPP6
+DPYSL4
+DUXAP9
+EBF3
+ECM2
+ERICH1
+ALKAL2
+FAM156A
+SHISAL2B
+FBN1
+FBXO11
+FLJ16779
+FLRT2
+FOXC1
+FOXC2
+FOXL1
+FRMD4A
+GAD1
+GALNS
+GALNT9
+HEYL
+HP
+ICOSLG
+IGF2
+IQCG
+KCTD10
+PRDM16-DT
+LIPA
+LOX
+LRRC17
+LRRN3
+MEG3
+MLC1
+MMP13
+MMP23B
+MUC4
+MYOM2
+NADSYN1
+NAPSA
+NEK3
+NFATC1
+NKAIN4
+NKX6-2
+NOTUM
+NPIPA1
+NPIPA8
+NPTX1
+OGN
+OMD
+P3H1
+PAPSS2
+PASK
+PCNT
+PDIA2
+PDXDC2P
+PGC
+PGM2
+PKD1P1
+PLAC9
+PLCH2
+POFUT2
+PP7080
+PXYLP1
+RASA3
+RHOJ
+RNF144A
+SCUBE1
+SCUBE3
+SDF4
+SDHAP1
+SFTA2
+SFTA3
+SFTPA1
+SFTPA2
+SFTPB
+SFTPC
+SFTPD
+SLC17A9
+SLC6A13
+SLC6A3
+SLC9A3
+SORCS2
+SS18L1
+STARD5
+SYNDIG1
+TARBP1
+TBCD
+TBX18
+TMCO3
+TMEM52
+TNNT3
+TRAPPC2L
+TWIST2
+VAT1L
+WFDC1
+CCN4
+WSB1
+WWP2
+ZBTB21
+))
 
 
 (define hgnc-id-ls
@@ -1406,7 +1548,5 @@ Queries I'm interested in
  '(26926)
 '(JAGN1)
 
- '(11117 11118)
- '(PMI-19-137)
- '(SMN1 SMN2)
+
  |#
