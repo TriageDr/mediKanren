@@ -6,24 +6,819 @@
 #|--- PMI-CASE-REGISTRY INPUT ---|#
 (time
  (define pmi-ls
-   '(PMI-18-137
-     PMI-18-137))
+   '(test))
 
  (define sym-hgnc-ls
-   '(SMN1
-     SMN2))
+   '(POLR3K))
 
  (define hgnc-id-ls/num
    (map number->string
-	'(11117
-	  11118)))
+	'(14121)))
+
+;; stopped 12/17/19 on ODC1 edges
+#|
+(define pmi-ls
+  '(PMI-18-1
+    PMI-18-10
+    PMI-18-100
+    PMI-18-101
+    PMI-18-102
+    PMI-18-103
+    PMI-18-104
+    PMI-18-105
+    PMI-18-108
+    PMI-18-109
+    PMI-18-11
+    PMI-18-111
+    PMI-18-111
+    PMI-18-116
+    PMI-18-117
+    PMI-18-12
+    PMI-18-120
+    PMI-18-120
+    PMI-18-121
+    PMI-18-123
+    PMI-18-125
+    PMI-18-125
+    PMI-18-126
+    PMI-18-126
+    PMI-18-13
+    PMI-18-131
+    PMI-18-134
+    PMI-18-134
+    PMI-18-136
+    PMI-18-138
+    PMI-18-139
+    PMI-18-14
+    PMI-18-140
+    PMI-18-141
+    PMI-18-142
+    PMI-18-144
+    PMI-18-147
+    PMI-18-148
+    PMI-18-155
+    PMI-18-156
+    PMI-18-159
+    PMI-18-160
+    PMI-18-161
+    PMI-18-164
+    PMI-18-166
+    PMI-18-167
+    PMI-18-168
+    PMI-18-169
+    PMI-18-169
+    PMI-18-171
+    PMI-18-172
+    PMI-18-172
+    PMI-18-172
+    PMI-18-173
+    PMI-18-174
+    PMI-18-179
+    PMI-18-180-1
+    PMI-18-180-2
+    PMI-18-180-2
+    PMI-18-181
+    PMI-18-181
+    PMI-18-182
+    PMI-18-184
+    PMI-18-185
+    PMI-18-19
+    PMI-18-2
+    PMI-18-2
+    PMI-18-20
+    PMI-18-22
+    PMI-18-23
+    PMI-18-24
+    PMI-18-26
+    PMI-18-27
+    PMI-18-28
+    PMI-18-28
+    PMI-18-29
+    PMI-18-3 
+    PMI-18-30
+    PMI-18-30
+    PMI-18-31
+    PMI-18-32
+    PMI-18-33
+    PMI-18-33
+    PMI-18-34
+    PMI-18-36
+    PMI-18-36
+    PMI-18-36
+    PMI-18-38
+    PMI-18-4
+    PMI-18-41
+    PMI-18-42 
+    PMI-18-43
+    PMI-18-46
+    PMI-18-47
+    PMI-18-49
+    PMI-18-53
+    PMI-18-53
+    PMI-18-55
+    PMI-18-6
+    PMI-18-60
+    PMI-18-60
+    PMI-18-64
+    PMI-18-69
+    PMI-18-74
+    PMI-18-74
+    PMI-18-79
+    PMI-18-8
+    PMI-18-82
+    PMI-18-83
+    PMI-18-83
+    PMI-18-83
+    PMI-18-88
+    PMI-18-9
+    PMI-18-91
+    PMI-18-92
+    PMI-18-92
+    PMI-18-92
+    PMI-18-93
+    PMI-18-98
+    PMI-18-99
+    PMI-18-99
+    PMI-18-99
+    PMI-19-10
+    PMI-19-10
+    PMI-19-100
+    PMI-19-102
+    PMI-19-104
+    PMI-19-105
+    PMI-19-106
+    PMI-19-111
+    PMI-19-111
+    PMI-19-111
+    PMI-19-111
+    PMI-19-111
+    PMI-19-111
+    PMI-19-114
+    PMI-19-115
+    PMI-19-116
+    PMI-19-120
+    PMI-19-121
+    PMI-19-122
+    PMI-19-123
+    PMI-19-124
+    PMI-19-125
+    PMI-19-126 
+    PMI-19-127
+    PMI-19-130
+    PMI-19-131
+    PMI-19-131
+    PMI-19-133
+    PMI-19-134
+    PMI-19-135
+    PMI-19-135
+    PMI-19-135
+    PMI-19-135
+    PMI-19-135
+    PMI-19-135
+    PMI-19-139
+    PMI-19-14
+    PMI-19-14
+    PMI-19-14
+    PMI-19-140
+    PMI-19-141
+    PMI-19-142
+    PMI-19-143
+    PMI-19-144
+    PMI-19-145 
+    PMI-19-146 
+    PMI-19-15
+    PMI-19-150
+    PMI-19-151
+    PMI-19-151
+    PMI-19-152
+    PMI-19-152
+    PMI-19-157
+    PMI-19-157
+    PMI-19-159
+    PMI-19-16
+    PMI-19-161
+    PMI-19-166
+    PMI-19-167
+    PMI-19-168
+    PMI-19-17
+    PMI-19-171
+    PMI-19-173
+    PMI-19-174
+    PMI-19-174
+    PMI-19-174
+    PMI-19-174
+    PMI-19-178
+    PMI-19-178
+    PMI-19-179
+    PMI-19-180
+    PMI-19-181
+    PMI-19-181
+    PMI-19-182
+    PMI-19-182
+    PMI-19-183
+    PMI-19-184
+    PMI-19-187
+    PMI-19-20
+    PMI-19-24
+    PMI-19-24
+    PMI-19-26
+    PMI-19-26
+    PMI-19-28
+    PMI-19-29
+    PMI-19-3
+    PMI-19-37
+    PMI-19-38
+    PMI-19-39
+    PMI-19-40
+    PMI-19-42
+    PMI-19-42
+    PMI-19-43
+    PMI-19-44
+    PMI-19-46 
+    PMI-19-47
+    PMI-19-5
+    PMI-19-5
+    PMI-19-5
+    PMI-19-53
+    PMI-19-56
+    PMI-19-58
+    PMI-19-58
+    PMI-19-58
+    PMI-19-61
+    PMI-19-65
+    PMI-19-66
+    PMI-19-68
+    PMI-19-69
+    PMI-19-70
+    PMI-19-71
+    PMI-19-74
+    PMI-19-75
+    PMI-19-77
+    PMI-19-77
+    PMI-19-77
+    PMI-19-77
+    PMI-19-78
+    PMI-19-8
+    PMI-19-80
+    PMI-19-83
+    PMI-19-87
+    PMI-19-89
+    PMI-19-93
+    PMI-19-96
+    PMI-19-96
+    PMI-19-97
+    PMI-19-99
+    PMI-19-99
+    ))
+
+(define sym-hgnc-ls
+  '(NTRK2
+    SCN2A
+    ACO2
+    MEF2C
+    KCNMA1
+    ASXL2
+    PPM1D
+    SOX5
+    EGFR
+    SHANK3
+    RARB 
+    NYFC
+    ZFHX3
+    TRAF7
+    HNRNPU
+    ZMIZ1
+    PURA
+    RLIM
+    POLG1
+    JAK2 
+    HCN1 
+    SPG4
+    USP9X 
+    KAT6A
+    CSNK2B
+    MTM1
+    DSC2
+    SCN5A
+    TMLHE
+    KCNC1
+    PRDX1
+    GLDC
+    STXBP1
+    GRIN2B
+    RPS6KA3
+    IRF2BPL
+    ODC1
+    FLNA
+    HADHA
+    SETBP1
+    ADCY5
+    GPD1L
+    WFS1
+    UGDH
+    GABRB2
+    CACNA1A
+    BICD2
+    LIAS
+    NGLY1
+    TOR1A
+    KRAS
+    MFN2 
+    PIGO
+    POLR3A
+    TBK1
+    COL6A2
+    PLA2G6
+    PLA2G6
+    NPHP3
+    GRIN1
+    GRIN2A
+    KDM1A_LSD1 
+    NGLY1
+    HIVEP2
+    MPP5_Pals1 
+    SCN8A
+    YWHAZ
+    FKTN
+    DHX30
+    DCHS1
+    ELP2
+    COL3A1
+    SMC1A
+    UGDH
+    UGDH
+    SCN2A
+    PTPRC
+    IRF2BPL
+    IRF2BPL 
+    PTEN
+    GRIN1
+    CCDS1
+    SLC6A8
+    KCNQ3
+    HDAC8
+    CCDC22
+    FANCD2
+    CFTR
+    CHAMP1
+    MECP2
+    MAPK8IP3
+    NACC1
+    BCOR
+    TCF4
+    MTMR8
+    USP9X
+    MECR
+    MT_TL1
+    PTPN11
+    NLGN4X
+    GLI2 
+    RHOB
+    PKAN
+    KCNH5 
+    RYR3
+    CACNA1A
+    PIGA
+    ACOX1
+    NFE2L2
+    RANBP2
+    SGSH
+    DNM1L
+    BRAF
+    ADAR
+    HCA2_GPR109A
+    HCA1_GPR81
+    HCA3_GPR109B
+    GMPPA
+    CDKL5
+    INPP5E 
+    PNKP
+    VRK1
+    LMNA
+    SMAD7
+    KCNT1
+    HECW2
+    MTHFR
+    CLN2
+    EP300
+    COL5A2
+    COL6A3
+    COL9A1
+    COL11A1
+    GATA6
+    RIN2
+    RHOBTB2
+    MEF2C
+    LGI1
+    SCN1A
+    SCN1A
+    KCNT1
+    EPM2A
+    FOXG1
+    SCN1A
+    ALDH7A1
+    SCN1A
+    SPAST
+    KIAA2022
+    RAC1
+    FHL1
+    SRD5A3
+    ADSL
+    AMT
+    AMT
+    ATP1A3
+    ERCC6
+    ZBTB24
+    KCNQ2
+    ALMS1
+    PAK3
+    SCN2A
+    ARX
+    AIMP1
+    FLNA
+    STXBP1
+    STXBP1
+    SCN1A
+    SCN1A
+    SLC10A2
+    CACNA1A
+    MFN2
+    AARS
+    MYO7A
+    MYO7A
+    MED13
+    KCNV2
+    ECHS1
+    ADNP
+    AIFM1
+    NGLY1
+    KMT2B
+    KCNN3
+    COL1A1
+    GPX4
+    NARFL
+    TELO2
+    EPHB4
+    STK25
+    STK25
+    RAB3GAP2
+    RAB3GAP2
+    ANKRD26
+    PPT1
+    KCNQ3
+    SYNGAP1
+    FOXG1
+    KNL1
+    HNRNPH2
+    SCN2A
+    IQCB1
+    NANS
+    TBCD
+    PTEN
+    CHD5
+    DOCK10
+    EDA2R
+    STXBP1
+    FBXO11
+    PSEN1
+    CDC42
+    DMD
+    KCNQ2
+    ERCC6L
+    MET
+    WDR35
+    FIG4
+    CDKL5
+    RHOBTB2
+    FLNA
+    MT_ATP6
+    PLOD1
+    WISP3
+    EHMT1
+    ATM
+    BTK
+    CACNA1H
+    MTOR
+    DYRK1A
+    RBM28
+    RNASEH2B
+    ANKRD11
+    NALCN
+    AP4M1
+    Ppp2r1a 
+    TNFRSF13C
+    KCNB1
+    NLRP1
+    BAHCC1
+    MLST8
+    ATN1
+    SCN1A
+    Ppp2r1a
+    GAN
+    ZFYVE26
+    GEMIN5
+    TNFRSF1A
+    ALMS1
+    RPGRIP1L
+    GABRB3
+    SLC6A1
+    CACNA1A
+    ))
+ 
+(define hgnc-id-ls/num
+  (map number->string 
+       '(8032
+	 10588
+	 118
+	 6996
+	 6284
+	 23805
+	 9277
+	 11201
+	 3236
+	 14294
+	 9865
+	 7806
+	 777
+	 20456
+	 5048
+	 16493
+	 9701
+	 13429
+	 9179
+	 6192
+	 4845
+	 11233
+	 12632
+	 13013
+	 2460
+	 7448
+	 3036
+	 10593
+	 18308
+	 6233
+	 9352
+	 4313
+	 11444
+	 4586
+	 10432
+	 14282
+	 8109
+	 3754
+	 4801
+	 15573
+	 236
+	 28956
+	 12762
+	 12525
+	 4082
+	 1388
+	 17208
+	 16429
+	 17646
+	 3098
+	 6407
+	 16877
+	 23215
+	 30074
+	 11584
+	 2212
+	 9039
+	 9039
+	 7907
+	 4584
+	 4585
+	 29079
+	 17646
+	 4921
+	 18669
+	 10596
+	 12855
+	 3622
+	 16716
+	 13681
+	 18248
+	 2201
+	 11111
+	 12525
+	 12525
+	 10588
+	 9666
+	 14282
+	 14282
+	 9588
+	 4584
+	 11055
+	 11055
+	 6297
+	 13315
+	 28909
+	 3585
+	 1884
+	 20311
+	 6990
+	 6884
+	 20967
+	 20893
+	 11634
+	 16825
+	 12632
+	 19691
+	 7490
+	 9644
+	 14287
+	 4318
+	 668
+	 15894
+	 6254
+	 10485
+	 1388
+	 8957
+	 119
+	 7782
+	 9848
+	 10818
+	 2973
+	 1097
+	 225
+	 24827
+	 4532
+	 16824
+	 22923
+	 11411
+	 21474
+	 9154
+	 12718
+	 6636
+	 6773
+	 18865
+	 29853
+	 7436
+	 2073
+	 3373
+	 2210
+	 2213
+	 2217
+	 2186
+	 4174
+	 18750
+	 18756
+	 6996
+	 6572
+	 10585
+	 10585
+	 18865
+	 3413
+	 3811
+	 10585
+	 877
+	 10585
+	 11233
+	 29433
+	 9801
+	 3702
+	 25812
+	 291
+	 473
+	 473
+	 801
+	 3438
+	 21143
+	 6296
+	 428
+	 8592
+	 10588
+	 18060
+	 10648
+	 3754
+	 11444
+	 11444
+	 10585
+	 10585
+	 10906
+	 1388
+	 16877
+	 20
+	 7606
+	 7606
+	 22474
+	 19698
+	 3151
+	 15766
+	 8768
+	 17646
+	 15840
+	 6292
+	 2197
+	 4556
+	 14179
+	 29099
+	 3395
+	 11404
+	 11404
+	 17168
+	 17168
+	 29186
+	 9325
+	 6297
+	 11497
+	 3811
+	 24054
+	 5042
+	 10588
+	 28949
+	 19237
+	 11581
+	 9588
+	 16816
+	 23479
+	 17756
+	 11444
+	 13590
+	 9508
+	 1736
+	 2928
+	 6296
+	 20794
+	 7029
+	 29250
+	 16873
+	 11411
+	 18756
+	 3754
+	 7414
+	 9081
+	 12771
+	 24650
+	 795
+	 1133
+	 1395
+	 3942
+	 3091
+	 21863
+	 25671
+	 21316
+	 19082
+	 574
+	 9302
+	 17755
+	 6231
+	 14374
+	 29279
+	 24825
+	 3033
+	 10585
+	 9302
+	 4137
+	 20761
+	 20043
+	 11916
+	 428
+	 29168
+	 4083
+	 11042
+	 1388
+	 )))
+
+(define hgnc-id-ls
+  (map (lambda (ls)
+	 (string-append "HGNC:" ls))
+       hgnc-id-ls/num))
+|# 
+ 
+#|
+ (define pmi-ls
+   '(for_peyton_vw
+     for_peyton_vw
+     for_peyton_vw
+     for_peyton_vw
+     for_peyton_vw))
+
+ (define sym-hgnc-ls
+   '(JAGN1
+     ARFGEF1
+     ARFGEF2
+     MIA3
+     GBF1
+     MIA2))
+
+ (define hgnc-id-ls/num
+   (map number->string
+	'(26926
+	  15772
+	  15853
+	  24008
+	  4181
+	  18432)))
+|#
 
  (define hgnc-id-ls
    (map (lambda (ls)
 	  (string-append "HGNC:" ls))
 	hgnc-id-ls/num)) 
-
-#|--- KEY-VALUES ---|#
+ 
+ 
+ #|--- KEY-VALUES ---|#
 
 ;;15 orange predicates
 ;;88 robokop predicates
@@ -181,10 +976,12 @@
     (cond
       ((null? ls) els)
       ((or (void? (car ls))
-	   #|(regexp-match #rx"^UMLS:C0017337$" (car ls))
-	   (regexp-match #rx"^Genes$" (car ls))|#
-	   #|(regexp-match #rx":[Nn][Oo][Cc][Oo][Dd][Ee]" (car ls))|#
-	   #|(number? (car ls))|#)
+	   (number? (car ls))
+	   (regexp-match #rx":[Nn][Oo][Cc][Oo][Dd][Ee]" (car ls))
+	   (regexp-match #rx"^UMLS:C0017337$" (car ls))
+	   (regexp-match #rx"ClinVarVariant:+" (car ls))
+	   (regexp-match #rx"^N[MCPG]_[0-9]+" (car ls)))
+	   #|(regexp-match #rx"^Genes$" (car ls))|#
        (prune-xrefs (cdr ls) els))
       ((string-contains? (car ls) "NCBI")
        (prune-xrefs (cdr ls)
@@ -192,7 +989,6 @@
 	 (string-replace (car ls) "NCBIGENE:" "NCBIGene:") els)))
       (else
        (prune-xrefs (cdr ls) (cons (car ls) els))))))
-
 
 (define extract-name/concept
   (lambda (query-ls els)
@@ -248,7 +1044,7 @@
 					 (get-xrefs orange-concept-key/synonym subject-props-assoc)
 					 (get-xrefs semmed-concept-key/xrefs subject-props-assoc)
 					 (get-xrefs robokop-concept-key/eq-id subject-props-assoc)
-					 #|(get-assoc-value semmed-concept-key/id subject-props-assoc)|#) els))]
+					 (get-assoc-value semmed-concept-key/id subject-props-assoc)) els))]
 	     [`(,edge-cui
 		    (,subject-cui ,subject-id ,subject-name (,_ . ,subject-category) ,subject-props-assoc)
 		    (,concept-cui ,concept-id ,concept-name (,_ . ,concept-category) ,concept-props-assoc)
@@ -263,6 +1059,25 @@
 					(get-xrefs semmed-concept-key/xrefs subject-props-assoc)
 					(get-xrefs robokop-concept-key/eq-id subject-props-assoc)
 					(get-assoc-value semmed-concept-key/id subject-props-assoc)) els))])))))
+#|
+(define query-with-curie/str
+  (lambda (ls els)
+    (cond
+      ((null? ls) (set-union els))
+      ((atom? (car ls))
+       (cond 
+	 ((not (string-contains? (car ls) ":"))
+	  (query-with-curie/str (cdr ls)
+				(set-union (find-concepts/options #f #f 0 #f
+								  (list (format "~a" (car ls)))) els)))
+	 (else
+	  (query-with-curie/str (cdr ls)
+				(set-union (find-concepts #t (list (car ls))) els)))))
+      (else
+       (set-union 
+	(query-with-curie/str (car ls) els)
+	(query-with-curie/str (cdr ls) els))))))
+|#
 
 (define query-with-curie/str
   (lambda (ls els)
@@ -281,6 +1096,7 @@
        (set-union 
 	(query-with-curie/str (car ls) els)
 	(query-with-curie/str (cdr ls) els))))))
+
 
 (define get-rxnorm
   (lambda (ls els)
@@ -352,8 +1168,7 @@
 
 
 (define export-path
-  "/home/mjpatton/PhD/CaseReviews/18_137_PMICase/")
-
+  "/home/mjpatton/PhD/CaseReviews/")
 
 (newline)
 (displayln "HELPER-FUNCTIONS LOADED, BEGINNING GENE-CONCEPT BUILDING")
@@ -375,8 +1190,8 @@
      (let* (#|(export-path
 	     (path->string (find-system-path 'desk-dir)))|#
 	    (all-downregulator/path
-	     (format
-	      "~a~a_all_drug_downregulators_for_~a.tsv" export-path pmi-ls sym-hgnc-ls))
+	    (format
+	    "~a~a_all_drug_downregulators_for_~a.tsv" export-path pmi-ls sym-hgnc-ls))
 	    (all-upregulator/path
 	     (format
 	      "~a~a_all_drug_upregulators_for_~a.tsv" export-path pmi-ls sym-hgnc-ls))
@@ -458,9 +1273,12 @@
 	      (remove-duplicates
 	       (prune-xrefs
 		(flatten (get-concept-xrefs query-start/hgnc '())) '())))
+	     ;;test with xref-from-hgnc
+	     (gene-concept-ls
+	      (find-concepts #t xrefs-from-hgnc))
 	     (gene-concept-ls
 	      (time
-	       (query-with-curie/str xrefs-from-hgnc '())))	    
+	       (query-with-curie/str xrefs-from-hgnc '())))
 	     (drugs
 	      '((semmed 4 . "chemical_substance")
 		(rtx 0 . "chemical_substance")
@@ -481,7 +1299,6 @@
 		(orange 22 . "(\"genomic entity\")")
 		(semmed 9 . "genomic_entity")
 		(rtx 2 . "microRNA")
-		(rtx 3 . "metabolite")
 		(orange 15 . "(\"transcript\")")))
 	     (filtered-X-molecular_entity "MOLECULAR-ENTITY")
 	     (disease
@@ -514,14 +1331,17 @@
 		(robokop 14 . "(\"named_thing\" \"disease\" \"phenotypic_feature\")")))
 	     (filtered-X-disease "SYMPTOM/DISEASE"))
        
-	    (define start-time (current-seconds))
+       (define start-time (current-seconds))
 
-
-	    #| (pretty-print
-	    (remove-duplicates
-	    (prune-xrefs
-	    (flatten
-	    (get-concept-xrefs gene-concept-ls '())) '())))|#
+       (displayln (format "LIST OF ~a ALIASES/EXTERNAL-IDS FROM HGNC:ID" sym-hgnc-ls))
+       (pretty-print xrefs-from-hgnc)
+       
+       (displayln (format "LIST OF ~a ALIASES/EXTERNAL-IDS FROM CURIE/STR FUNCTION" sym-hgnc-ls))
+       (pretty-print
+	(remove-duplicates
+	 (prune-xrefs
+	  (flatten
+	   (get-concept-xrefs gene-concept-ls '())) '())))
 	    
 	    (define check-concept-to-edge-match
 	      (lambda (edge-ls matched-edge-ls)
@@ -551,7 +1371,16 @@
 
 	    (newline)
 	    (displayln (format "~a ~a INHIBITS/DECREASES ~a EDGES FOUND" (length drug-dec-gene-list) filtered-X-drug  sym-hgnc-ls))
-	    (newline)            
+	    (newline)
+
+	    (displayln "DRUG->dec->gene-xrefs!")
+	    (pretty-print
+	     (remove-duplicates
+	      (prune-xrefs
+	       (flatten
+ 		(get-concept-xrefs-from-edges drug-dec-gene-list '())) '())))
+       
+	    
 	    (newline)
 	    (displayln (format "MATCHING\n~a-->DECREASES-->~a" filtered-X-drug sym-hgnc-ls))
 	    (newline)
@@ -585,6 +1414,14 @@
 	    (newline)
 	    (displayln (format "~a ~a ACTIVATES/INCREASES ~a EDGES FOUND" (length drug-inc-gene-list) filtered-X-drug  sym-hgnc-ls))
 	    (newline)
+
+	    (displayln "DRUG->inc->gene-xrefs!")
+	    (pretty-print
+	     (remove-duplicates
+	      (prune-xrefs
+	       (flatten
+ 		(get-concept-xrefs-from-edges drug-inc-gene-list '())) '())))
+
       
 	    (newline)
 	    (displayln (format "MATCHING\n~a-->INCREASES-->~a-EDGES" filtered-X-drug sym-hgnc-ls))
@@ -701,17 +1538,18 @@
 		     filtered-X-molecular_entity
 		     sym-hgnc-ls))
 	    (newline)
+	    #|
 	    (newline)
 	    (displayln (format "GATHERING ALIASES & EXTERNAL-REFERENCES\nFOR ~a REGULATORS OF ~a" filtered-X-molecular_entity sym-hgnc-ls))
 	    (newline)
 
 	    ;; CHECKING FOR META-IDENTIFIER STRINGS LIKE GENES
-	   #|(displayln "MOL_ENTITY->dec->gene-xrefs!")
+	   (displayln "MOL_ENTITY->dec->gene-xrefs!")
 	    (pretty-print
 	     (remove-duplicates
 	      (prune-xrefs
 	       (flatten
- 		(get-concept-xrefs-from-edges molecular_entity-dec-gene-list '())) '())))|#
+ 		(get-concept-xrefs-from-edges molecular_entity-dec-gene-list '())) '())))
        
 	    (define mol_entity-dec-o-xrefs
 	      (time
@@ -722,12 +1560,12 @@
 		   (get-concept-xrefs-from-edges molecular_entity-dec-gene-list '())) '())) '())))
         
 	    ;; test to see what goes into the query
-	    #|(displayln "MOL_ENTITY->inc->gene-xrefs!")
+	    (displayln "MOL_ENTITY->inc->gene-xrefs!")
 	    (pretty-print
 	     (remove-duplicates
 	      (prune-xrefs
 	       (flatten
-		(get-concept-xrefs-from-edges molecular_entity-inc-gene-list '())) '())))|#
+		(get-concept-xrefs-from-edges molecular_entity-inc-gene-list '())) '())))
        
 	    (define mol_entity-inc-o-xrefs
 	      (time
@@ -736,7 +1574,7 @@
 		 (prune-xrefs 
 		  (flatten
 		   (get-concept-xrefs-from-edges molecular_entity-inc-gene-list '())) '())) '())))
-       
+       |#
 	    (define pure-gene-upregulator?
 	      (lambda (ls)
 		(and (member? (list-ref ls 1) (flatten mol_entity-inc-o/edge))
@@ -1124,7 +1962,7 @@
 	       out-drug-dec-molecular_entity->inc->gene  
 	       out-drug-inc-molecular_entity->inc->gene  
 	       out-drug-dec-molecular_entity->dec->gene))  
-					       
+   		       
 	    
 |#
 	    (newline)
