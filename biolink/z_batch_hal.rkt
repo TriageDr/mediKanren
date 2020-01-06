@@ -3,10 +3,928 @@
          (all-from-out "common.rkt" "mk-db.rkt"))
 (require "common.rkt" "mk-db.rkt")
 
-
 (define export-path
-  "/home/mjpatton/PhD/CaseReviews/18_50_PMICase/")
+  "/home/mjpatton/PhD/CaseReviews/test_2_hop/")
 
+(define pmi-ls
+  '(PMI-19-168))
+(define sym-hgnc-ls
+  '(KCNN3))
+
+(define hgnc-id-ls/num
+  (remove-duplicates
+   (map number->string
+	'(6292))))
+
+#|
+(define pmi-ls
+  '(PMI-18-1
+    PMI-18-10
+    PMI-18-100
+    PMI-18-101
+    PMI-18-102
+    PMI-18-103
+    PMI-18-104
+    PMI-18-105
+    PMI-18-108
+    PMI-18-109
+    PMI-18-11
+    PMI-18-111
+    PMI-18-111
+    PMI-18-116
+    PMI-18-117
+    PMI-18-12
+    PMI-18-120
+    PMI-18-120
+    PMI-18-121
+    PMI-18-123
+    PMI-18-125
+    PMI-18-125
+    PMI-18-126
+    PMI-18-126
+    PMI-18-13
+    PMI-18-131
+    PMI-18-134
+    PMI-18-134
+    PMI-18-136
+    PMI-18-138
+    PMI-18-139
+    PMI-18-14
+    PMI-18-140
+    PMI-18-141
+    PMI-18-142
+    PMI-18-144
+    PMI-18-147
+    PMI-18-148
+    PMI-18-155
+    PMI-18-156
+    PMI-18-159
+    PMI-18-160
+    PMI-18-161
+    PMI-18-164
+    PMI-18-166
+    PMI-18-167
+    PMI-18-168
+    PMI-18-169
+    PMI-18-169
+    PMI-18-171
+    PMI-18-172
+    PMI-18-172
+    PMI-18-172
+    PMI-18-173
+    PMI-18-174
+    PMI-18-179
+    PMI-18-180-1
+    PMI-18-180-2
+    PMI-18-180-2
+    PMI-18-181
+    PMI-18-181
+    PMI-18-182
+    PMI-18-184
+    PMI-18-185
+    PMI-18-19
+    PMI-18-2
+    PMI-18-2
+    PMI-18-20
+    PMI-18-22
+    PMI-18-23
+    PMI-18-24
+    PMI-18-26
+    PMI-18-27
+    PMI-18-28
+    PMI-18-28
+    PMI-18-29
+    PMI-18-3 
+    PMI-18-30
+    PMI-18-30
+    PMI-18-31
+    PMI-18-32
+    PMI-18-33
+    PMI-18-33
+    PMI-18-34
+    PMI-18-36
+    PMI-18-36
+    PMI-18-36
+    PMI-18-38
+    PMI-18-4
+    PMI-18-41
+    PMI-18-42 
+    PMI-18-43
+    PMI-18-46
+    PMI-18-47
+    PMI-18-49
+    PMI-18-53
+    PMI-18-53
+    PMI-18-55
+    PMI-18-6
+    PMI-18-60
+    PMI-18-60
+    PMI-18-64
+    PMI-18-69
+    PMI-18-74
+    PMI-18-74
+    PMI-18-79
+    PMI-18-8
+    PMI-18-82
+    PMI-18-83
+    PMI-18-83
+    PMI-18-83
+    PMI-18-88
+    PMI-18-9
+    PMI-18-91
+    PMI-18-92
+    PMI-18-92
+    PMI-18-92
+    PMI-18-93
+    PMI-18-98
+    PMI-18-99
+    PMI-18-99
+    PMI-18-99
+    PMI-19-10
+    PMI-19-10
+    PMI-19-100
+    PMI-19-102
+    PMI-19-104
+    PMI-19-105
+    PMI-19-106
+    PMI-19-111
+    PMI-19-111
+    PMI-19-111
+    PMI-19-111
+    PMI-19-111
+    PMI-19-111
+    PMI-19-114
+    PMI-19-115
+    PMI-19-116
+    PMI-19-120
+    PMI-19-121
+    PMI-19-122
+    PMI-19-123
+    PMI-19-124
+    PMI-19-125
+    PMI-19-126 
+    PMI-19-127
+    PMI-19-130
+    PMI-19-131
+    PMI-19-131
+    PMI-19-133
+    PMI-19-134
+    PMI-19-135
+    PMI-19-135
+    PMI-19-135
+    PMI-19-135
+    PMI-19-135
+    PMI-19-135
+    PMI-19-139
+    PMI-19-14
+    PMI-19-14
+    PMI-19-14
+    PMI-19-140
+    PMI-19-141
+    PMI-19-142
+    PMI-19-143
+    PMI-19-144
+    PMI-19-145 
+    PMI-19-146 
+    PMI-19-15
+    PMI-19-150
+    PMI-19-151
+    PMI-19-151
+    PMI-19-152
+    PMI-19-152
+    PMI-19-157
+    PMI-19-157
+    PMI-19-159
+    PMI-19-16
+    PMI-19-161
+    PMI-19-166
+    PMI-19-167
+    PMI-19-168
+    PMI-19-17
+    PMI-19-171
+    PMI-19-173
+    PMI-19-174
+    PMI-19-174
+    PMI-19-174
+    PMI-19-174
+    PMI-19-178
+    PMI-19-178
+    PMI-19-179
+    PMI-19-180
+    PMI-19-181
+    PMI-19-181
+    PMI-19-182
+    PMI-19-182
+    PMI-19-183
+    PMI-19-184
+    PMI-19-187
+    PMI-19-20
+    PMI-19-24
+    PMI-19-24
+    PMI-19-26
+    PMI-19-26
+    PMI-19-28
+    PMI-19-29
+    PMI-19-3
+    PMI-19-37
+    PMI-19-38
+    PMI-19-39
+    PMI-19-40
+    PMI-19-42
+    PMI-19-42
+    PMI-19-43
+    PMI-19-44
+    PMI-19-46 
+    PMI-19-47
+    PMI-19-5
+    PMI-19-5
+    PMI-19-5
+    PMI-19-53
+    PMI-19-56
+    PMI-19-58
+    PMI-19-58
+    PMI-19-58
+    PMI-19-61
+    PMI-19-65
+    PMI-19-66
+    PMI-19-68
+    PMI-19-69
+    PMI-19-70
+    PMI-19-71
+    PMI-19-74
+    PMI-19-75
+    PMI-19-77
+    PMI-19-77
+    PMI-19-77
+    PMI-19-77
+    PMI-19-78
+    PMI-19-8
+    PMI-19-80
+    PMI-19-83
+    PMI-19-87
+    PMI-19-89
+    PMI-19-93
+    PMI-19-96
+    PMI-19-96
+    PMI-19-97
+    PMI-19-99
+    PMI-19-99
+    ))
+
+(define sym-hgnc-ls
+  '(NTRK2
+    SCN2A
+    ACO2
+    MEF2C
+    KCNMA1
+    ASXL2
+    PPM1D
+    SOX5
+    EGFR
+    SHANK3
+    RARB 
+    NYFC
+    ZFHX3
+    TRAF7
+    HNRNPU
+    ZMIZ1
+    PURA
+    RLIM
+    POLG1
+    JAK2 
+    HCN1 
+    SPG4
+    USP9X 
+    KAT6A
+    CSNK2B
+    MTM1
+    DSC2
+    SCN5A
+    TMLHE
+    KCNC1
+    PRDX1
+    GLDC
+    STXBP1
+    GRIN2B
+    RPS6KA3
+    IRF2BPL
+    ODC1
+    FLNA
+    HADHA
+    SETBP1
+    ADCY5
+    GPD1L
+    WFS1
+    UGDH
+    GABRB2
+    CACNA1A
+    BICD2
+    LIAS
+    NGLY1
+    TOR1A
+    KRAS
+    MFN2 
+    PIGO
+    POLR3A
+    TBK1
+    COL6A2
+    PLA2G6
+    PLA2G6
+    NPHP3
+    GRIN1
+    GRIN2A
+    KDM1A_LSD1 
+    NGLY1
+    HIVEP2
+    MPP5_Pals1 
+    SCN8A
+    YWHAZ
+    FKTN
+    DHX30
+    DCHS1
+    ELP2
+    COL3A1
+    SMC1A
+    UGDH
+    UGDH
+    SCN2A
+    PTPRC
+    IRF2BPL
+    IRF2BPL 
+    PTEN
+    GRIN1
+    CCDS1
+    SLC6A8
+    KCNQ3
+    HDAC8
+    CCDC22
+    FANCD2
+    CFTR
+    CHAMP1
+    MECP2
+    MAPK8IP3
+    NACC1
+    BCOR
+    TCF4
+    MTMR8
+    USP9X
+    MECR
+    MT_TL1
+    PTPN11
+    NLGN4X
+    GLI2 
+    RHOB
+    PKAN
+    KCNH5 
+    RYR3
+    CACNA1A
+    PIGA
+    ACOX1
+    NFE2L2
+    RANBP2
+    SGSH
+    DNM1L
+    BRAF
+    ADAR
+    HCA2_GPR109A
+    HCA1_GPR81
+    HCA3_GPR109B
+    GMPPA
+    CDKL5
+    INPP5E 
+    PNKP
+    VRK1
+    LMNA
+    SMAD7
+    KCNT1
+    HECW2
+    MTHFR
+    CLN2
+    EP300
+    COL5A2
+    COL6A3
+    COL9A1
+    COL11A1
+    GATA6
+    RIN2
+    RHOBTB2
+    MEF2C
+    LGI1
+    SCN1A
+    SCN1A
+    KCNT1
+    EPM2A
+    FOXG1
+    SCN1A
+    ALDH7A1
+    SCN1A
+    SPAST
+    KIAA2022
+    RAC1
+    FHL1
+    SRD5A3
+    ADSL
+    AMT
+    AMT
+    ATP1A3
+    ERCC6
+    ZBTB24
+    KCNQ2
+    ALMS1
+    PAK3
+    SCN2A
+    ARX
+    AIMP1
+    FLNA
+    STXBP1
+    STXBP1
+    SCN1A
+    SCN1A
+    SLC10A2
+    CACNA1A
+    MFN2
+    AARS
+    MYO7A
+    MYO7A
+    MED13
+    KCNV2
+    ECHS1
+    ADNP
+    AIFM1
+    NGLY1
+    KMT2B
+    KCNN3
+    COL1A1
+    GPX4
+    NARFL
+    TELO2
+    EPHB4
+    STK25
+    STK25
+    RAB3GAP2
+    RAB3GAP2
+    ANKRD26
+    PPT1
+    KCNQ3
+    SYNGAP1
+    FOXG1
+    KNL1
+    HNRNPH2
+    SCN2A
+    IQCB1
+    NANS
+    TBCD
+    PTEN
+    CHD5
+    DOCK10
+    EDA2R
+    STXBP1
+    FBXO11
+    PSEN1
+    CDC42
+    DMD
+    KCNQ2
+    ERCC6L
+    MET
+    WDR35
+    FIG4
+    CDKL5
+    RHOBTB2
+    FLNA
+    MT_ATP6
+    PLOD1
+    WISP3
+    EHMT1
+    ATM
+    BTK
+    CACNA1H
+    MTOR
+    DYRK1A
+    RBM28
+    RNASEH2B
+    ANKRD11
+    NALCN
+    AP4M1
+    Ppp2r1a 
+    TNFRSF13C
+    KCNB1
+    NLRP1
+    BAHCC1
+    MLST8
+    ATN1
+    SCN1A
+    Ppp2r1a
+    GAN
+    ZFYVE26
+    GEMIN5
+    TNFRSF1A
+    ALMS1
+    RPGRIP1L
+    GABRB3
+    SLC6A1
+    CACNA1A
+    ))
+ 
+(define hgnc-id-ls/num
+  (map number->string 
+       '(8032
+	 10588
+	 118
+	 6996
+	 6284
+	 23805
+	 9277
+	 11201
+	 3236
+	 14294
+	 9865
+	 7806
+	 777
+	 20456
+	 5048
+	 16493
+	 9701
+	 13429
+	 9179
+	 6192
+	 4845
+	 11233
+	 12632
+	 13013
+	 2460
+	 7448
+	 3036
+	 10593
+	 18308
+	 6233
+	 9352
+	 4313
+	 11444
+	 4586
+	 10432
+	 14282
+	 8109
+	 3754
+	 4801
+	 15573
+	 236
+	 28956
+	 12762
+	 12525
+	 4082
+	 1388
+	 17208
+	 16429
+	 17646
+	 3098
+	 6407
+	 16877
+	 23215
+	 30074
+	 11584
+	 2212
+	 9039
+	 9039
+	 7907
+	 4584
+	 4585
+	 29079
+	 17646
+	 4921
+	 18669
+	 10596
+	 12855
+	 3622
+	 16716
+	 13681
+	 18248
+	 2201
+	 11111
+	 12525
+	 12525
+	 10588
+	 9666
+	 14282
+	 14282
+	 9588
+	 4584
+	 11055
+	 11055
+	 6297
+	 13315
+	 28909
+	 3585
+	 1884
+	 20311
+	 6990
+	 6884
+	 20967
+	 20893
+	 11634
+	 16825
+	 12632
+	 19691
+	 7490
+	 9644
+	 14287
+	 4318
+	 668
+	 15894
+	 6254
+	 10485
+	 1388
+	 8957
+	 119
+	 7782
+	 9848
+	 10818
+	 2973
+	 1097
+	 225
+	 24827
+	 4532
+	 16824
+	 22923
+	 11411
+	 21474
+	 9154
+	 12718
+	 6636
+	 6773
+	 18865
+	 29853
+	 7436
+	 2073
+	 3373
+	 2210
+	 2213
+	 2217
+	 2186
+	 4174
+	 18750
+	 18756
+	 6996
+	 6572
+	 10585
+	 10585
+	 18865
+	 3413
+	 3811
+	 10585
+	 877
+	 10585
+	 11233
+	 29433
+	 9801
+	 3702
+	 25812
+	 291
+	 473
+	 473
+	 801
+	 3438
+	 21143
+	 6296
+	 428
+	 8592
+	 10588
+	 18060
+	 10648
+	 3754
+	 11444
+	 11444
+	 10585
+	 10585
+	 10906
+	 1388
+	 16877
+	 20
+	 7606
+	 7606
+	 22474
+	 19698
+	 3151
+	 15766
+	 8768
+	 17646
+	 15840
+	 6292
+	 2197
+	 4556
+	 14179
+	 29099
+	 3395
+	 11404
+	 11404
+	 17168
+	 17168
+	 29186
+	 9325
+	 6297
+	 11497
+	 3811
+	 24054
+	 5042
+	 10588
+	 28949
+	 19237
+	 11581
+	 9588
+	 16816
+	 23479
+	 17756
+	 11444
+	 13590
+	 9508
+	 1736
+	 2928
+	 6296
+	 20794
+	 7029
+	 29250
+	 16873
+	 11411
+	 18756
+	 3754
+	 7414
+	 9081
+	 12771
+	 24650
+	 795
+	 1133
+	 1395
+	 3942
+	 3091
+	 21863
+	 25671
+	 21316
+	 19082
+	 574
+	 9302
+	 17755
+	 6231
+	 14374
+	 29279
+	 24825
+	 3033
+	 10585
+	 9302
+	 4137
+	 20761
+	 20043
+	 11916
+	 428
+	 29168
+	 4083
+	 11042
+	 1388
+	 )))
+|#
+
+#|
+;; pmi-19-153 SEF genes
+(define pmi-ls
+  '("PMI-19-153"))
+
+(define sym-hgnc-ls
+  '("SEF_lungbiopsy_upregulated_genelist"))
+  
+(define hgnc-id-ls/num
+  (remove-duplicates
+   (map number->string
+	'(38
+	 14899
+	 943
+	 320
+	 19990
+	 489
+	 490
+	 2013
+	 638
+	 14103
+	 15607
+	 14872
+	 974
+	 24176
+	 14343
+	 1325
+	 1389
+	 1537
+	 26295
+	 1705
+	 20455
+	 2174
+	 2191
+	 22990
+	 2333
+	 24292
+	 2498
+	 2530
+	 20348
+	 2907
+	 2908
+	 2926
+	 3010
+	 3016
+	 32188
+	 19087
+	 3154
+	 27234
+	 27683
+	 30114
+	 34236
+	 3603
+	 13590
+	 3761
+	 3800
+	 3801
+	 3817
+	 25491
+	 4092
+	 4122
+	 4131
+	 4882
+	 5141
+	 17087
+	 5466
+	 25251
+	 23236
+	 48664
+	 6617
+	 6664
+	 16895
+	 17200
+	 14575
+	 17082
+	 7159
+	 7171
+	 7514
+	 7614
+	 29832
+	 13395
+	 7746
+	 7775
+	 16191
+	 19321
+	 27106
+	 7909
+	 41983
+	 7952
+	 8126
+	 8134
+	 19316
+	 8604
+	 17270
+	 16068
+	 14180
+	 27559
+	 8890
+	 8906
+	 30065
+	 19255
+	 29037
+	 14683
+	 26303
+	 20331
+	 688
+	 20457
+	 13441
+	 13655
+	 24188
+	 32455
+	 18386
+	 18387
+	 10798
+	 10799
+	 10801
+	 10802
+	 10803
+	 16192
+	 11046
+	 11049
+	 11073
+	 16698
+	 15592
+	 18065
+	 15885
+	 11568
+	 11581
+	 11595
+	 20329
+	 27916
+	 11950
+	 30887
+	 20670
+	 29315
+	 15466
+	 12769
+	 19221
+	 16804
+	 13083
+	 ))))
+|#
+
+#|
 ;;pmi 18-50 ch12 dup-inv
 (define pmi-ls
   '("PMI-18-50"))
@@ -525,6 +1443,7 @@
 	  100
 	  ))))
 
+|#
 #|
 
 ;;pmi18-137 ch16 del
@@ -1174,20 +2093,43 @@ list of fibrosarcoma concepts
   (lambda (ls els)
     (cond
       ((null? ls) els)
-      ((or (void? (car ls))
-	   #|(number? (car ls))|#
-	   (regexp-match #rx":[Nn][Oo][Cc][Oo][Dd][Ee]" (car ls))
-	   #|(regexp-match #rx"^UMLS:C0017337$" (car ls))
-	   (regexp-match #rx"ClinVarVariant:+" (car ls))
-	   (regexp-match #rx"^N[MCPG]_[0-9]+" (car ls)))
-	   (regexp-match #rx"^Genes$" (car ls))|#)
+      ((void? (car ls))
        (prune-xrefs (cdr ls) els))
+      ((string-contains? (car ls) "HGNC")
+       (cons (car ls)
+	     (prune-xrefs (cdr ls)
+			  (cons
+			   (string-replace (car ls) "HGNC:" "HGNC:HGNC:") els))))
       ((string-contains? (car ls) "NCBI")
        (prune-xrefs (cdr ls)
-	(cons 
-	 (string-replace (car ls) "NCBIGENE:" "NCBIGene:") els)))
+		    (cons 
+		     (string-replace (car ls) "NCBIGENE:" "NCBIGene:") els)))
       (else
        (prune-xrefs (cdr ls) (cons (car ls) els))))))
+
+
+(define prune-xrefs/outliers
+  (lambda (ls els)
+    (cond
+      ((null? ls) els)
+      ((or
+	(void? (car ls))
+	(not (string-contains? (car ls) ":"))
+	(string-contains? (car ls) "Genes")
+	(string-contains? (car ls) "MTH:NOCODE")
+	(string-contains? (car ls) "UMLS:C0017337"))
+       (prune-xrefs/outliers (cdr ls) els))
+      ((string-contains? (car ls) "HGNC:HGNC")
+       (prune-xrefs/outliers
+	(cdr ls)
+	(cons (string-replace (car ls) "HGNC:HGNC:" "HGNC:")
+	      els)))
+      ((string-contains? (car ls) "NCBI")
+       (prune-xrefs/outliers (cdr ls)
+		    (cons 
+		     (string-replace (car ls) "NCBIGENE:" "NCBIGene:") els)))
+      (else
+       (prune-xrefs/outliers (cdr ls) (cons (car ls) els))))))
 
 (define extract-name/concept
   (lambda (query-ls els)
@@ -1218,6 +2160,22 @@ list of fibrosarcoma concepts
 	       (get-concept-xrefs (cdr query-ls)
 				  (set-union
 				   (list id name
+					 (get-xrefs orange-concept-key/same-as properties-list)
+					 (get-xrefs orange-concept-key/synonym properties-list)
+					 (get-xrefs semmed-concept-key/xrefs properties-list)
+					 (get-xrefs robokop-concept-key/eq-id properties-list)
+					 (get-assoc-value semmed-concept-key/id properties-list)) els))])))))
+
+(define get-concept-xrefs/2-hop
+  (lambda (query-ls els)
+    (cond
+      ((null? query-ls) (set-union els))
+      (else 
+       (match (car query-ls)
+	      [`(,db ,cui ,id ,name ,category ,properties-list)
+	       (get-concept-xrefs/2-hop (cdr query-ls)
+				  (set-union
+				   (list id
 					 (get-xrefs orange-concept-key/same-as properties-list)
 					 (get-xrefs orange-concept-key/synonym properties-list)
 					 (get-xrefs semmed-concept-key/xrefs properties-list)
@@ -1259,7 +2217,41 @@ list of fibrosarcoma concepts
 					(get-xrefs robokop-concept-key/eq-id subject-props-assoc)
 					(get-assoc-value semmed-concept-key/id subject-props-assoc)) els))])))))
 
-#|(define query-with-curie/str
+;; if get-concept/2hop will isolate drugs that directly and indirectly
+;; regulate a gene or a gene-regulator
+
+(define get-concept-xrefs-from-edges/2-hop
+  (lambda (query-ls els curie-ls)
+    (cond
+      ((null? query-ls) (set-union els))
+      (else 
+       (match (car query-ls)
+	      [`(,db ,edge-cui
+		     (,subject-cui ,subject-id ,subject-name (,_ . ,subject-category) ,subject-props-assoc)
+		     (,concept-cui ,concept-id ,concept-name (,_ . ,concept-category) ,concept-props-assoc)
+		     (,_ . ,pred)
+		     ,pred-props-assoc)
+	       (cond
+		 ((intersect?
+		   (flatten
+		    (list subject-id
+			  (get-xrefs orange-concept-key/same-as subject-props-assoc)
+			  (get-xrefs orange-concept-key/synonym subject-props-assoc)
+			  (get-xrefs semmed-concept-key/xrefs subject-props-assoc)
+			  (get-xrefs robokop-concept-key/eq-id subject-props-assoc)
+			  (get-assoc-value semmed-concept-key/id subject-props-assoc)))
+		   curie-ls)
+		  (get-concept-xrefs-from-edges/2-hop (cdr query-ls)
+						(set-union
+						 (flatten
+						  (list subject-id
+							(get-xrefs orange-concept-key/same-as subject-props-assoc)
+							(get-xrefs semmed-concept-key/xrefs subject-props-assoc)))
+						 els) curie-ls))
+		 (else 
+		  (get-concept-xrefs-from-edges/2-hop (cdr query-ls) els curie-ls)))])))))
+
+(define query-with-curie/str
   (lambda (ls els)
     (cond
       ((null? ls) (set-union els))
@@ -1268,14 +2260,107 @@ list of fibrosarcoma concepts
 	 ((not (string-contains? (car ls) ":"))
 	  (query-with-curie/str (cdr ls)
 				(set-union (find-concepts/options #f #f 0 #f
-								  (list (format "~a" (car ls)))) els)))
+								  (list (format "~a" (car ls))))
+					   els)))
 	 (else
 	  (query-with-curie/str (cdr ls)
 				(set-union (find-concepts #t (list (car ls))) els)))))
       (else
        (set-union 
 	(query-with-curie/str (car ls) els)
-	(query-with-curie/str (cdr ls) els))))))|#
+	(query-with-curie/str (cdr ls) els))))))
+
+(define get-concept-xrefs/umls
+  (lambda (query-ls els curie-ls)
+    (cond
+      ((null? query-ls) els)
+      (else 
+       (match (car query-ls)
+	      [`(,db ,cui ,id ,name ,category ,properties-list)
+	       (cond
+		 ((intersect?
+		  (flatten
+		   (list id
+			 (get-xrefs orange-concept-key/same-as properties-list)
+			 (get-xrefs orange-concept-key/synonym properties-list)
+			 (get-xrefs semmed-concept-key/xrefs properties-list)
+			 (get-xrefs robokop-concept-key/eq-id properties-list)
+			 (get-assoc-value semmed-concept-key/id properties-list)))
+		  curie-ls)
+		  (get-concept-xrefs/umls (cdr query-ls)
+					  (set-union
+					   (flatten
+					    (list id
+						  (get-xrefs orange-concept-key/same-as properties-list)
+						  (get-xrefs semmed-concept-key/xrefs properties-list)))
+					   els) curie-ls))
+		 (else 
+		  (get-concept-xrefs/umls (cdr query-ls) els curie-ls)))])))))
+
+
+#|
+(define str-query/inner-loop
+  (lambda (ls els)
+    (if (not (null? ls))
+	(flatten (cons (get-concept-xrefs/singleton (car ls)) els))
+	els)))
+
+#|
+(define get-assoc-value
+  (lambda (key assoc-ls)
+    (cond
+      ((assoc key assoc-ls)
+       => (lambda (assoc-ls)
+            (let ((assoc-key (car assoc-ls))
+                  (assoc-value (cdr assoc-ls)))
+              (if (equal? assoc-key key)
+                  assoc-value
+                  #f))))
+      (else
+       '()))))
+|#
+
+(define check-str-query
+  (lambda (ls curie-ls els)
+    (cond
+      ((null? ls) els)
+      ((intersect? (get-concept-xrefs (car ls)) curie-ls)
+       (check-str-query (cdr ls) curie-ls
+			(cons (car ls) els)))
+      (else
+       (check-str-query (cdr ls) curie-ls els)))))
+
+
+|#
+#|
+(define check-str-query
+  (lambda (str/curie-ls els curie-ls)
+    (cond
+      ((null? str/curie-ls) els)
+      ((intersect?
+	curie-ls
+	(flatten (get-concept-xrefs (find-concepts #f #f 0 str/curie-ls))))
+       (check-str-query
+	(cdr str/curie-ls)
+	(cons
+	 (flatten (get-concept-xrefs/singleton (car str-concepts)))
+	 els)
+	curie-ls))
+      (else
+       (check-str-query (cdr str/curie-ls) els curie-ls)))))
+|#
+#|
+(define get-external-str-ids-from-curie
+  (lambda (ls els curie-ls)
+    (cond
+      ((null? ls) els)
+      ((not (string-contains? (car ls) ":"))
+       (get-external-str-ids-from-curie
+	(cdr ls) (set-union (check-str-query ls '() curie-ls) els) curie-ls))
+      (else
+       (get-external-str-ids-from-curie
+	(cdr ls) (cons (car ls) els) curie-ls)))))
+|#
 
 (define get-rxnorm
   (lambda (ls els)
@@ -1313,7 +2398,6 @@ list of fibrosarcoma concepts
        (if (symbol? (car ls))
 	   (string-join (map symbol->string ls) " ")
 	   (string-join ls " "))))))
-
 
 (define match-drug-pred-gene-edges
   (lambda (edges-ls els)
@@ -1371,46 +2455,22 @@ list of fibrosarcoma concepts
 		  (get-xrefs robokop-concept-key/eq-id properties-list)
 		  (get-assoc-value semmed-concept-key/id properties-list))])))
 
+(define get-curies-from-concepts
+  (lambda (ls)
+    (match (ls)
+	   [`(,db ,cui ,id ,name ,category ,properties-list)
+	    (list id name)])))
+
 (define get-hgnc-from-ls
   (lambda (ls els)
     (cond
       ((null? ls) els)
-      ((equal? (regexp-match #rx"HGNC:[0-9]+" (car ls)) #f)
+      ((and (equal? (regexp-match #rx"HGNC:[0-9]+" (car ls)) #f)
+	    (equal? (regexp-match #rx"HGNC:HGNC:[0-9]+" (car ls)) #f))
        (get-hgnc-from-ls (cdr ls) els))
       (else
        (get-hgnc-from-ls (cdr ls)
-			 (set-union (regexp-match #rx"HGNC:[0-9]+" (car ls)) els))))))
-       
-(define loop-str-query
-  (lambda (ls els curie-ls)
-    (cond
-      ((null? ls) els)
-      (else
-       (let ((str-concept-ls
-	      (find-concepts/options
-	       #f #f 0 #f
-	       (list (format "~a" (car ls))))))
-	 (cond
-	   ((null? str-concept-ls) els)
-	   ((intersect?
-	     curie-ls
-	     (get-hgnc-from-ls (flatten (get-concept-xrefs/singleton (car str-concept-ls))) '()))
-	    (loop-str-query (cdr str-concept-ls)
-			    (set-union (flatten (get-concept-xrefs/singleton (car str-concept-ls))) els)
-			    curie-ls))
-	   (else
-	    (loop-str-query (cdr str-concept-ls) els curie-ls))))))))
-       
-(define get-external-str-ids-from-curie
-  (lambda (ls els curie-ls)
-    (cond
-      ((null? ls) els)
-      ((not (string-contains? (car ls) ":"))
-       (get-external-str-ids-from-curie
-	(cdr ls) (set-union (loop-str-query ls '() curie-ls) els) curie-ls))
-      (else
-       (get-external-str-ids-from-curie
-	(cdr ls) (cons (car ls) els) curie-ls)))))
+			 (set-union (regexp-match #rx"HGNC:(.*)" (car ls)) els))))))
 
 #|(export-path
 (path->string (find-system-path 'desk-dir)))|#
@@ -1431,7 +2491,8 @@ list of fibrosarcoma concepts
 	  (export-column-headers (cdr headers) port path))))
       (else
        (void)))))
-
+#|
+;; for large-batch
 (define start-function
   (time 
    (lambda (pmi-ls hgnc-id-ls sym-hgnc-ls)
@@ -1440,6 +2501,17 @@ list of fibrosarcoma concepts
        (else
 	(handle pmi-ls (car hgnc-id-ls) sym-hgnc-ls)
 	(start-function pmi-ls (cdr hgnc-id-ls) sym-hgnc-ls))))))
+|#
+;; for case-registry
+
+(define start-function
+  (time 
+   (lambda (pmi-ls hgnc-id-ls sym-hgnc-ls)
+     (cond
+       ((null? hgnc-id-ls) (void))
+       (else
+	(handle (car pmi-ls) (car hgnc-id-ls) (car sym-hgnc-ls))
+	(start-function (cdr pmi-ls) (cdr hgnc-id-ls) (cdr sym-hgnc-ls)))))))
 
 (define handle
   (time
@@ -1448,65 +2520,81 @@ list of fibrosarcoma concepts
        ((null? hgnc-id-ls) (void))
        (else
 	(let* ((all-downregulator/path
-		(format		;	;
-	       "~a~a_all_drug_downregulators_for_~a.tsv" export-path pmi-ls sym-hgnc-ls)) ; ;
-	       (all-upregulator/path ;	;
-	       (format		;	;
-	       "~a~a_all_drug_upregulators_for_~a.tsv" export-path pmi-ls sym-hgnc-ls)) ; ;
-	       (mixed-downregulator/path ; ;
-	       (format		;	;
-	       "~a~a_mixed_drug_downregulators_for_~a.tsv" export-path pmi-ls sym-hgnc-ls)) ; ;
-	       (pure-downregulator/path ; ;
-	       (format		;	;
-	       "~a~a_pure_drug_downregulators_for_~a.tsv" export-path pmi-ls sym-hgnc-ls)) ; ;
-	       (mixed-upregulator/path ; ;
-	       (format		;	;
-	       "~a~a_mixed_drug_upregulators_for_~a.tsv" export-path pmi-ls sym-hgnc-ls)) ; ;
-	       (pure-upregulator/path ;	;
-	       (format		;	;
-	       "~a~a_pure_drug_upregulators_for_~a.tsv" export-path pmi-ls sym-hgnc-ls)) ; ;
-	       (out-dec/all	;	;
-	       (open-output-file all-downregulator/path #:exists 'append)) ; ;
-	       (out-inc/all	;	;
-	       (open-output-file all-upregulator/path #:exists 'append)) ; ;
-	       (out-dec/mr	;	;
-	       (open-output-file mixed-downregulator/path #:exists 'append)) ; ;
-	       (out-inc/mr	;	;
-	       (open-output-file mixed-upregulator/path #:exists 'append)) ; ;
-	       (out-dec/pr	;	;
-	       (open-output-file pure-downregulator/path #:exists 'append)) ; ;
-	       (out-inc/pr	;	;
- 	       (open-output-file pure-upregulator/path #:exists 'append)) ; ;
-	       (all_molecular_entity-dec/path ; ;
-	       (format		;	;
-	       "~a~a_all_molecular_entity_downregulators_for_~a.tsv" export-path pmi-ls sym-hgnc-ls)) ; ;
-	       (all_molecular_entity-inc/path ; ;
-	       (format		;	;
-	       "~a~a_all_molecular_entity_upregulators_for_~a.tsv" export-path pmi-ls sym-hgnc-ls)) ; ;
-	       (pure_molecular_entity-inc/path ; ;
-	       (format		;	;
-	       "~a~a_pure_molecular_entity_upregulators_for_~a.tsv" export-path pmi-ls sym-hgnc-ls)) ; ;
-	       (pure_molecular_entity-dec/path ; ;
-	       (format		;	;
-	       "~a~a_pure_molecular_entity_downregulators_for_~a.tsv" export-path pmi-ls sym-hgnc-ls)) ; ;
-	       (mixed_molecular_entity-inc/path ; ;
-	       (format		;	;
-	       "~a~a_mixed_molecular_entity_upregulators_for_~a.tsv" export-path pmi-ls sym-hgnc-ls)) ; ;
-	       (mixed_molecular_entity-dec/path ; ;
-	       (format		;	;
-	       "~a~a_mixed_molecular_entity_downregulators_for_~a.tsv" export-path pmi-ls sym-hgnc-ls)) ; ;
-	       (out-all_molecular_entity_dec ; ;
- 	       (open-output-file all_molecular_entity-dec/path #:exists 'append)) ; ;
-	       (out-all_molecular_entity_inc ; ;
- 	       (open-output-file all_molecular_entity-inc/path #:exists 'append)) ; ;
-	       (out-pure_molecular_entity_dec ; ;
- 	       (open-output-file pure_molecular_entity-dec/path #:exists 'append)) ; ;
-	       (out-pure_molecular_entity_inc ; ;
- 	       (open-output-file pure_molecular_entity-inc/path #:exists 'append)) ; ;
-	       (out-mixed_molecular_entity_dec ; ;
- 	       (open-output-file mixed_molecular_entity-dec/path #:exists 'append)) ; ;
-	       (out-mixed_molecular_entity_inc ; ;
- 	       (open-output-file mixed_molecular_entity-inc/path #:exists 'append))
+		(format			
+	       "~a~a_all_drug_downregulators_for_~a.tsv" export-path pmi-ls sym-hgnc-ls))  
+	       (all-upregulator/path 	
+	       (format			
+	       "~a~a_all_drug_upregulators_for_~a.tsv" export-path pmi-ls sym-hgnc-ls))  
+	       (mixed-downregulator/path  
+	       (format			
+	       "~a~a_mixed_drug_downregulators_for_~a.tsv" export-path pmi-ls sym-hgnc-ls))  
+	       (pure-downregulator/path  
+	       (format			
+	       "~a~a_pure_drug_downregulators_for_~a.tsv" export-path pmi-ls sym-hgnc-ls))  
+	       (mixed-upregulator/path  
+	       (format			
+	       "~a~a_mixed_drug_upregulators_for_~a.tsv" export-path pmi-ls sym-hgnc-ls))  
+	       (pure-upregulator/path 	
+	       (format			
+	       "~a~a_pure_drug_upregulators_for_~a.tsv" export-path pmi-ls sym-hgnc-ls))  
+	       (out-dec/all		
+	       (open-output-file all-downregulator/path #:exists 'append))  
+	       (out-inc/all		
+	       (open-output-file all-upregulator/path #:exists 'append))  
+	       (out-dec/mr		
+	       (open-output-file mixed-downregulator/path #:exists 'append))  
+	       (out-inc/mr		
+	       (open-output-file mixed-upregulator/path #:exists 'append))  
+	       (out-dec/pr		
+	       (open-output-file pure-downregulator/path #:exists 'append))  
+	       (out-inc/pr		
+ 	       (open-output-file pure-upregulator/path #:exists 'append))  
+	       (all_molecular_entity-dec/path  
+	       (format			
+	       "~a~a_all_molecular_entity_downregulators_for_~a.tsv" export-path pmi-ls sym-hgnc-ls))  
+	       (all_molecular_entity-inc/path  
+	       (format			
+	       "~a~a_all_molecular_entity_upregulators_for_~a.tsv" export-path pmi-ls sym-hgnc-ls))  
+	       (pure_molecular_entity-inc/path  
+	       (format			
+	       "~a~a_pure_molecular_entity_upregulators_for_~a.tsv" export-path pmi-ls sym-hgnc-ls))  
+	       (pure_molecular_entity-dec/path  
+	       (format			
+	       "~a~a_pure_molecular_entity_downregulators_for_~a.tsv" export-path pmi-ls sym-hgnc-ls))  
+	       (mixed_molecular_entity-inc/path  
+	       (format			
+	       "~a~a_mixed_molecular_entity_upregulators_for_~a.tsv" export-path pmi-ls sym-hgnc-ls))  
+	       (mixed_molecular_entity-dec/path  
+	       (format			
+	       "~a~a_mixed_molecular_entity_downregulators_for_~a.tsv" export-path pmi-ls sym-hgnc-ls))  
+	       (out-all_molecular_entity_dec  
+ 	       (open-output-file all_molecular_entity-dec/path #:exists 'append))  
+	       (out-all_molecular_entity_inc  
+ 	       (open-output-file all_molecular_entity-inc/path #:exists 'append))  
+	       (out-pure_molecular_entity_dec  
+ 	       (open-output-file pure_molecular_entity-dec/path #:exists 'append))  
+	       (out-pure_molecular_entity_inc  
+ 	       (open-output-file pure_molecular_entity-inc/path #:exists 'append))  
+	       (out-mixed_molecular_entity_dec  
+ 	       (open-output-file mixed_molecular_entity-dec/path #:exists 'append))  
+	       (out-mixed_molecular_entity_inc  
+		(open-output-file mixed_molecular_entity-inc/path #:exists 'append))
+	       (direct+indirect-activator/path 
+		(format "~a~a_combined_direct_and_indirect_drug_activators_for_~a" export-path pmi-ls sym-hgnc-ls)) 
+	       (indirect-activator/path 
+		(format "~a~a_indirect_drug_activators_for_~a" export-path pmi-ls sym-hgnc-ls)) 
+	       (direct+indirect-inhibitor/path 
+		(format "~a~a_combined_direct_and_indirect_drug_inhibitors_for_~a" export-path pmi-ls sym-hgnc-ls)) 
+	       (indirect-inhibitor/path 
+		(format "~a~a_indirect_drug_inhibitors_for_~a" export-path pmi-ls sym-hgnc-ls)) 
+	       (out-direct+indirect-activator 
+		(open-output-file direct+indirect-activator/path #:exists 'append)) 
+	       (out-indirect-activator 
+		(open-output-file indirect-activator/path #:exists 'append)) 
+	       (out-direct+indirect-inhibitor 
+		(open-output-file direct+indirect-inhibitor/path #:exists 'append)) 
+	       (out-indirect-inhibitor 
+		(open-output-file indirect-inhibitor/path #:exists 'append))
 	       (drugs
 		'((semmed 4 . "chemical_substance")
 		  (rtx 0 . "chemical_substance")
@@ -1566,37 +2654,35 @@ list of fibrosarcoma concepts
 		(remove-duplicates
 		 (prune-xrefs
 		  (flatten (get-concept-xrefs query-start/hgnc '())) '())))
-	       (xrefs-from-str/curie
-		(remove-duplicates
-		 (prune-xrefs
-		  (flatten 
-		   (get-external-str-ids-from-curie
-		    xrefs-from-hgnc '() xrefs-from-hgnc)) '())))
 	       (gene-concept-ls
-		(find-concepts #t xrefs-from-str/curie)))	  
-       
+		(find-concepts #t
+			       (get-concept-xrefs/umls
+				(query-with-curie/str xrefs-from-hgnc '()) '() xrefs-from-hgnc))))	  
+
 	  (define check-concept-to-edge-match
 	    (lambda (edge-ls matched-edge-ls)
 	      (if (= (length edge-ls) (length matched-edge-ls))
-		  (displayln (format "\nEDGES SUCCESSFULLY MATCHED FOR EXPORT!\n"))
+		  (displayln (format "\nALL EDGES SUCCESSFULLY MATCHED FOR EXPORT!\n"))
 		  (displayln (format "\nEXPORTED EDGES MAY CONTAIN DUPLICATE ENTRIES!\n")))))
 
-	  #|
+	  
 	  (displayln (format "LIST OF ~a ALIASES/EXTERNAL-IDS FROM HGNC:ID" sym-hgnc-ls))
 	  (newline)
-	  (pretty-print xrefs-from-hgnc)
+	  (pretty-print
+	   (get-concept-xrefs/umls
+	    (query-with-curie/str xrefs-from-hgnc '()) '() xrefs-from-hgnc))
 	  (newline)
-	  |#
+	  
 	  #|
 	  (displayln (format "LIST OF ~a ALIASES/EXTERNAL-IDS FROM CURIE/STR FUNCTION" sym-hgnc-ls))
 	  (newline)
-	  (pretty-print xrefs-from-str/curie)
+	  (pretty-print gene-concept-ls)
 	  (newline)
 	  |#
 
 	  (newline)
 	  (displayln
-	   (format "BEGINNING RUN/GRAPH 1-HOP:\n~a-->DECREASES-->~a" filtered-X-drug sym-hgnc-ls))
+	   (format "BEGINNING 1-HOP QUERY FOR DIRECT INHIBITORS OF ~a:\n~a-->DECREASES-->~a"sym-hgnc-ls filtered-X-drug sym-hgnc-ls))
 	  (newline)
        
 	  (match-define
@@ -1611,7 +2697,7 @@ list of fibrosarcoma concepts
 	  (define drug-dec-gene-list (hash-ref x-dec-gene=>edges 'X->dec))
 
 	  (newline)
-	  (displayln (format "~a ~a INHIBITS/DECREASES ~a EDGES FOUND" (length drug-dec-gene-list) filtered-X-drug  sym-hgnc-ls))
+	  (displayln (format "~a ~a-->INHIBITS/DECREASES-->~a EDGES FOUND!" (length drug-dec-gene-list) filtered-X-drug  sym-hgnc-ls))
 	  (newline)
 
 	  #|(newline)
@@ -1633,13 +2719,13 @@ list of fibrosarcoma concepts
 	       drug-dec-gene-list '()))))
 
 	  (newline)
-	  (displayln (format "~a ~a INHIBITS/DECREASES ~a EDGES MATCHED" (length x-dec-o/edge) filtered-X-drug  sym-hgnc-ls))
+	  (displayln (format "~a ~a-->INHIBITS/DECREASES-->~a EDGES MATCHED FOR EXPORT" (length x-dec-o/edge) filtered-X-drug  sym-hgnc-ls))
 	  (newline)
        
 	  (check-concept-to-edge-match drug-dec-gene-list x-dec-o/edge)
 
 	  (newline)
-	  (displayln (format "BEGINNING RUN/GRAPH 1-HOP:\n~a-->INCREASES-->~a" filtered-X-drug sym-hgnc-ls))
+	  (displayln (format "BEGINNING 1-HOP QUERY FOR ~a:\n~a-->INCREASES-->~a" sym-hgnc-ls filtered-X-drug sym-hgnc-ls))
 	  (newline)
       
 	  (match-define
@@ -1652,9 +2738,9 @@ list of fibrosarcoma concepts
 	     (Y Y->inc gene-concept-ls))))
       
 	  (define drug-inc-gene-list (hash-ref y-inc-gene=>edges 'Y->inc))
-
+	  
 	  (newline)
-	  (displayln (format "~a ~a ACTIVATES/INCREASES ~a EDGES FOUND" (length drug-inc-gene-list) filtered-X-drug  sym-hgnc-ls))
+	  (displayln (format "~a ~a-->ACTIVATES/INCREASES-->~a EDGES FOUND!" (length drug-inc-gene-list) filtered-X-drug  sym-hgnc-ls))
 	  (newline)
 	    
 	  #|(displayln "DRUG->inc->gene-xrefs!")
@@ -1665,7 +2751,7 @@ list of fibrosarcoma concepts
  	      (get-concept-xrefs-from-edges drug-inc-gene-list '())) '())))|#
       
 	  (newline)
-	  (displayln (format "MATCHING\n~a-->INCREASES-->~a-EDGES" filtered-X-drug sym-hgnc-ls))
+	  (displayln (format "MATCHING\n~a-->INCREASES-->~a EDGES" filtered-X-drug sym-hgnc-ls))
 	  (newline)
        
 	  (define x-inc-o/edge
@@ -1692,7 +2778,7 @@ list of fibrosarcoma concepts
 		   (not (member? (list-ref ls 1) (flatten x-dec-o/edge))))))
              
 	  (newline)
-	  (displayln (format "BEGINNING RUN/GRAPH 1-HOP:\n~a-->DECREASES-->~a" filtered-X-molecular_entity sym-hgnc-ls))
+	  (displayln (format "BEGINNING 1-HOP QUERY FOR ~a:\n~a-->DECREASES-->~a" sym-hgnc-ls filtered-X-molecular_entity sym-hgnc-ls))
 	  (newline)
        
 	  (match-define
@@ -1707,14 +2793,14 @@ list of fibrosarcoma concepts
 	  (define molecular_entity-dec-gene-list (hash-ref w-dec-gene=>edges 'W->dec))
        
 	  (newline)
-	  (displayln (format "~a ~a INHIBITS/DECREASES ~a EDGES FOUND" (length molecular_entity-dec-gene-list) filtered-X-molecular_entity sym-hgnc-ls))
+	  (displayln (format "~a ~a-->INHIBITS/DECREASES-->~a EDGES FOUND!" (length molecular_entity-dec-gene-list) filtered-X-molecular_entity sym-hgnc-ls))
 	  (newline)
        
 	  (newline)
-	  (displayln (format "MATCHING\n~a-->DECREASES-->~a-EDGES" filtered-X-molecular_entity sym-hgnc-ls))
+	  (displayln (format "MATCHING EDGES:\n~a-->DECREASES-->~a-EDGES" filtered-X-molecular_entity sym-hgnc-ls))
 	  (newline)
 
-	  ;; because i don't scrape the edge-CUI-ID, the duplicate edges are removed for final export 
+	  ;;because i don't scrape the edge-CUI-ID, the duplicate edges are removed for final export 
 	  (define mol_entity-dec-o/edge
 	    (time
 	     (remove-duplicates
@@ -1744,7 +2830,7 @@ list of fibrosarcoma concepts
 	  (define molecular_entity-inc-gene-list (hash-ref z-inc-gene=>edges 'Z->inc))
        
 	  (newline)
-	  (displayln (format "~a ~a ACTIVATES/INCREASES ~a EDGES FOUND" (length molecular_entity-inc-gene-list) filtered-X-molecular_entity sym-hgnc-ls))
+	  (displayln (format "~a ~a-->ACTIVATES/INCREASES-->~a EDGES FOUND!" (length molecular_entity-inc-gene-list) filtered-X-molecular_entity sym-hgnc-ls))
 	  (newline)
 
 	  (newline)
@@ -1766,19 +2852,6 @@ list of fibrosarcoma concepts
 	  (check-concept-to-edge-match
 	   molecular_entity-inc-gene-list
 	   mol_entity-inc-o/edge)
-
-	  (newline)
-	  (displayln
-	   (format "1-HOP QUERIES COMPLETE:\n~a->INCREASES->~a\n~a->DECREASES->~a\n~a->INCREASES->~a\n~a->DECREASES->~a"
-		   filtered-X-drug
-		   sym-hgnc-ls
-		   filtered-X-drug
-		   sym-hgnc-ls
-		   filtered-X-molecular_entity
-		   sym-hgnc-ls
-		   filtered-X-molecular_entity
-		   sym-hgnc-ls))
-	  (newline)
        
 	  (define pure-gene-upregulator?
 	    (lambda (ls)
@@ -1789,18 +2862,6 @@ list of fibrosarcoma concepts
 	    (lambda (ls)
 	      (and (member? (list-ref ls 1) (flatten mol_entity-dec-o/edge))
 		   (not (member? (list-ref ls 1) (flatten mol_entity-inc-o/edge))))))
-
-
-	  (define (string-join strings delimiter)
-	    (if (null? strings)
-		""
-		(parameterize ((current-output-port (open-output-string)))
-		  (write-string (car strings))
-		  (for-each (lambda (s)
-			      (write-string delimiter)
-			      (write-string s))
-			    (cdr strings))
-		  (get-output-string (current-output-port)))))
 
 	  ;;loops for export
 	  (define outer-loop/dec
@@ -1855,47 +2916,52 @@ list of fibrosarcoma concepts
 
 	  #|--- DRUG->INC/DEC->GENE 1-HOP EXPORT: COLUMN HEADERS & DATA ---|#
 	  
-	  (export-column-headers pmi-ls out-dec/all all-downregulator/path) ; ;
-	  (export-column-headers COLUMN_HEADERS out-dec/all all-downregulator/path) ; ;
-	  (export-column-headers pmi-ls out-inc/all all-upregulator/path) ; ;
-	  (export-column-headers COLUMN_HEADERS out-inc/all all-upregulator/path) ; ;
-	  (export-column-headers pmi-ls out-dec/mr mixed-downregulator/path) ; ;
-	  (export-column-headers COLUMN_HEADERS out-dec/mr mixed-downregulator/path) ; ;
-	  (export-column-headers pmi-ls out-dec/pr pure-downregulator/path) ; ;
-	  (export-column-headers COLUMN_HEADERS out-dec/pr pure-downregulator/path) ; ;
-	  (export-column-headers pmi-ls out-inc/mr mixed-upregulator/path) ; ;
-	  (export-column-headers COLUMN_HEADERS out-inc/mr mixed-downregulator/path) ; ;
-	  (export-column-headers pmi-ls out-inc/pr pure-upregulator/path) ; ;
-	  (export-column-headers COLUMN_HEADERS out-inc/pr pure-upregulator/path) ; ;
+	  (export-column-headers (list pmi-ls) out-dec/all all-downregulator/path)  
+	  (export-column-headers COLUMN_HEADERS out-dec/all all-downregulator/path)  
+	  (export-column-headers (list pmi-ls) out-inc/all all-upregulator/path)  
+	  (export-column-headers COLUMN_HEADERS out-inc/all all-upregulator/path)  
+	  (export-column-headers (list pmi-ls) out-dec/mr mixed-downregulator/path)  
+	  (export-column-headers COLUMN_HEADERS out-dec/mr mixed-downregulator/path)  
+	  (export-column-headers (list pmi-ls) out-dec/pr pure-downregulator/path)  
+	  (export-column-headers COLUMN_HEADERS out-dec/pr pure-downregulator/path)  
+	  (export-column-headers (list pmi-ls) out-inc/mr mixed-upregulator/path)  
+	  (export-column-headers COLUMN_HEADERS out-inc/mr mixed-downregulator/path)  
+	  (export-column-headers (list pmi-ls) out-inc/pr pure-upregulator/path)  
+	  (export-column-headers COLUMN_HEADERS out-inc/pr pure-upregulator/path)  
 	  
 	  (define export-drug-dec-gene/edges
 	    (outer-loop x-dec-o/edge out-dec/all))
 	  (define export-drug-inc-gene/edges
 	    (outer-loop x-inc-o/edge out-inc/all))
+	  
 	  (define export_pure_mixed_drug_downregulators
 	    (outer-loop/dec x-dec-o/edge out-dec/mr out-dec/pr))
 	  (define export_pure_mixed_drug_upregulators
 	    (outer-loop/inc x-inc-o/edge out-inc/mr out-inc/pr))
 
 	  #|--- MOLECULAR-ENTITY->INC/DEC->GENE 1-HOP EXPORT: COLUMN HEADERS & DATA ---|#
+
+	  (newline)
+	  (displayln (format "EXPORTING COLUMN HEADERS FOR ~a 1-HOP QUERIES" sym-hgnc-ls))
+	  (newline)
 	  
-	  (export-column-headers pmi-ls out-all_molecular_entity_dec all_molecular_entity-dec/path) ; ;
-	  (export-column-headers COLUMN_HEADERS_MOL out-all_molecular_entity_dec all_molecular_entity-dec/path) ; ;
-	    				; ;
-	  (export-column-headers pmi-ls out-all_molecular_entity_inc all_molecular_entity-inc/path) ; ;
-	  (export-column-headers COLUMN_HEADERS_MOL out-all_molecular_entity_inc all_molecular_entity-inc/path) ; ;
-	    				; ;
-	  (export-column-headers pmi-ls out-mixed_molecular_entity_dec mixed_molecular_entity-dec/path)  ; ;
-	  (export-column-headers COLUMN_HEADERS_MOL out-mixed_molecular_entity_dec mixed_molecular_entity-dec/path) ; ;
-	    				; ;
-	  (export-column-headers pmi-ls out-pure_molecular_entity_dec pure_molecular_entity-dec/path) ; ;
-	  (export-column-headers COLUMN_HEADERS_MOL out-pure_molecular_entity_dec pure_molecular_entity-dec/path) ; ;
-	    				; ;
-	  (export-column-headers pmi-ls out-pure_molecular_entity_inc pure_molecular_entity-inc/path) ; ;
-	  (export-column-headers COLUMN_HEADERS_MOL out-pure_molecular_entity_inc pure_molecular_entity-inc/path) ; ;
-	    				; ;
-	  (export-column-headers pmi-ls out-mixed_molecular_entity_inc mixed_molecular_entity-inc/path) ; ;
-	  (export-column-headers COLUMN_HEADERS_MOL out-mixed_molecular_entity_inc mixed_molecular_entity-inc/path) ; ;
+	  (export-column-headers (list pmi-ls) out-all_molecular_entity_dec all_molecular_entity-dec/path)  
+	  (export-column-headers COLUMN_HEADERS_MOL out-all_molecular_entity_dec all_molecular_entity-dec/path)  
+	    				 
+	  (export-column-headers (list pmi-ls) out-all_molecular_entity_inc all_molecular_entity-inc/path)  
+	  (export-column-headers COLUMN_HEADERS_MOL out-all_molecular_entity_inc all_molecular_entity-inc/path)  
+	  
+	  (export-column-headers (list pmi-ls) out-mixed_molecular_entity_dec mixed_molecular_entity-dec/path)   
+	  (export-column-headers COLUMN_HEADERS_MOL out-mixed_molecular_entity_dec mixed_molecular_entity-dec/path)  
+	    				 
+	  (export-column-headers (list pmi-ls) out-pure_molecular_entity_dec pure_molecular_entity-dec/path)  
+	  (export-column-headers COLUMN_HEADERS_MOL out-pure_molecular_entity_dec pure_molecular_entity-dec/path)  
+	    				 
+	  (export-column-headers (list pmi-ls) out-pure_molecular_entity_inc pure_molecular_entity-inc/path)  
+	  (export-column-headers COLUMN_HEADERS_MOL out-pure_molecular_entity_inc pure_molecular_entity-inc/path)  
+	    				 
+	  (export-column-headers (list pmi-ls) out-mixed_molecular_entity_inc mixed_molecular_entity-inc/path)  
+	  (export-column-headers COLUMN_HEADERS_MOL out-mixed_molecular_entity_inc mixed_molecular_entity-inc/path)  
 	  
 	  (define export-mol-entity-dec-gene/edges
 	    (outer-loop mol_entity-dec-o/edge out-all_molecular_entity_dec))
@@ -1906,24 +2972,643 @@ list of fibrosarcoma concepts
 	    (outer-loop/dec mol_entity-dec-o/edge out-mixed_molecular_entity_dec out-pure_molecular_entity_dec))
 	  (define export_pure_mixed_gene_upregulators
 	    (outer-loop/inc mol_entity-inc-o/edge out-mixed_molecular_entity_inc out-pure_molecular_entity_inc))
+	  
+	  (newline)
+	  (displayln
+	   (format "1-HOP QUERIES COMPLETE & SUCCESSFULLY EXPORTED:\n~a->INCREASES->~a\n~a->DECREASES->~a\n~a->INCREASES->~a\n~a->DECREASES->~a"
+		   filtered-X-drug
+		   sym-hgnc-ls
+		   filtered-X-drug
+		   sym-hgnc-ls
+		   filtered-X-molecular_entity
+		   sym-hgnc-ls
+		   filtered-X-molecular_entity
+		   sym-hgnc-ls))
+	  (newline)
+
+	  #|--- 2-HOP QUERY CODE ---|#
+
+	  (newline)
+	  (displayln "#-----------------------------------------------------#")
+	  (newline)
+	  (newline)
+	  (displayln (format "PREPARING FOR ~a 2-HOP QUERY" sym-hgnc-ls))
+	  (newline)
+	  (newline)
+	  (displayln "#-----------------------------------------------------#")
+	  (newline)
+
+	  ;;loops for isolating edge-lists
+	  (define outer-loop/dec-for-list
+	    (lambda (ls els-pr)
+	      (cond
+		((null? ls) els-pr)
+		((or (pure-drug-downregulator? (car ls))
+		     (pure-gene-downregulator? (car ls)))
+		 (outer-loop/dec-for-list
+		  (cdr ls)
+		  (cons (car ls) els-pr)))
+		(else
+		 (outer-loop/dec-for-list (cdr ls) els-pr)))))
+
+	  (define outer-loop/inc-for-list
+	    (lambda (ls els-pr)
+	      (cond
+		((null? ls) els-pr)
+		((or (pure-drug-upregulator? (car ls))
+		     (pure-gene-upregulator? (car ls)))
+		 (outer-loop/inc-for-list
+		  (cdr ls)
+		  (cons (car ls) els-pr)))
+		(else
+		 (outer-loop/inc-for-list (cdr ls) els-pr)))))
+	  
+	  (define pure-gene-upregulator-ls/2-hop
+	    (cons (map cadr (outer-loop/inc-for-list mol_entity-inc-o/edge '())) '()))
+
+	  (define pure-gene-downregulator-ls/2-hop
+	    (cons (map cadr (outer-loop/dec-for-list mol_entity-dec-o/edge '())) '()))
+	  	  
+	  (define pure-drug-upregulator-ls/2-hop
+	    (cons (map cadr (outer-loop/inc-for-list x-inc-o/edge '())) '()))
+
+	  (define pure-drug-downregulator-ls/2-hop
+	    (cons (map cadr (outer-loop/dec-for-list x-dec-o/edge '())) '()))
+	  
+	  #|
+	  (define pure-drug-upregulator-ls/2-hop
+	    (outer-loop/inc-for-list x-inc-o/edge '()))
+	  |#
+
+	  (newline)
+	  (displayln (format "PURE DIRECT UPREGULATOR/ACTIVATOR DRUGS FOR ~a" sym-hgnc-ls))
+	  (newline)
+	  (pretty-print (map car (outer-loop/inc-for-list x-inc-o/edge '())))
+	  (newline)
+
+	  (newline)
+	  (displayln (format "PURE DIRECT DOWNREGULATOR/INHIBITOR DRUGS FOR ~a" sym-hgnc-ls))
+	  (newline)
+	  (pretty-print (map car (outer-loop/dec-for-list x-dec-o/edge '())))
+	  (newline)
+
+	  #|
+	  (pretty-print pure-drug-upregulator-ls/2-hop)
+	  (pretty-print pure-drug-downregulator-ls/2-hop)
+	  |#
+	  
+	  (newline)
+	  (displayln (format "PURE ~a ACTIVATORS/UPREGULATORS OF ~a" filtered-X-molecular_entity sym-hgnc-ls))
+	  (newline)
+	  
+	  (pretty-print (map car (outer-loop/inc-for-list mol_entity-inc-o/edge '())))
+	  
+	  (newline)
+	  (displayln (format "PURE ~a INHIBITOR/DOWNREGULATORS OF ~a" filtered-X-molecular_entity sym-hgnc-ls))
+	  (newline)
+
+	  ;; pure-gene-downregulator-ls/2-hop contains curies for genes
+	  (pretty-print (map car (outer-loop/dec-for-list mol_entity-dec-o/edge '())))
+	  (newline)
+	  
+	  ;;TODO print out edge concepts used for 2-hop query
+	  (define gene-upregulator-concept-ls/2-hop
+	    (query-with-curie/str
+	     (remove-duplicates 
+	      (prune-xrefs/outliers
+	       (flatten
+		(get-concept-xrefs/2-hop
+		 (query-with-curie/str
+		  (flatten
+		   pure-gene-upregulator-ls/2-hop) '()) '())) '())) '()))
+
+	  (newline)
+	  (displayln (format "GATHERING ALIASES & EXTERNAL-REFERENCES\nFOR ~a UP-REGULATORS OF ~a" filtered-X-molecular_entity sym-hgnc-ls))
+	  (newline)
+	  
+	  #|
+	  (pretty-print (map cadddr gene-upregulator-concept-ls/2-hop))
+	  (newline)
+	  (pretty-print (map caddr gene-upregulator-concept-ls/2-hop))
+	  (newline)
+	  |#
+	  
+	  (define gene-downregulator-concept-ls/2-hop
+	    (query-with-curie/str
+	     (remove-duplicates 
+	      (prune-xrefs/outliers
+	       (flatten
+		(get-concept-xrefs/2-hop
+		 (query-with-curie/str
+		  (flatten
+		   pure-gene-downregulator-ls/2-hop) '()) '())) '())) '()))	  
+
+	  (newline)
+	  (displayln (format "GATHERING ALIASES & EXTERNAL-REFERENCES\nFOR ~a DOWN-REGULATORS OF ~a" filtered-X-molecular_entity sym-hgnc-ls))
+	  (newline)
+	  
+	  #|
+	  (pretty-print (map cadddr gene-downregulator-concept-ls/2-hop))
+	  (newline)
+	  (pretty-print (map caddr gene-downregulator-concept-ls/2-hop))
+	  (newline)
+	  |#
+	  
+	  (newline)				
+	  (displayln (format "~a ALIASES/EXTERNAL-IDENTIFIERS FOUND\n~a ACTIVATORS OF ~a" (length gene-upregulator-concept-ls/2-hop) filtered-X-molecular_entity sym-hgnc-ls))
+	  
+	  (newline)				
+	  (displayln (format "~a ALIASES/EXTERNAL-IDENTIFIERS FOUND\n~a INHIBITORS OF ~a" (length gene-downregulator-concept-ls/2-hop) filtered-X-molecular_entity sym-hgnc-ls))
+	  
+	  (newline)
+	  (displayln (format "BEGINNING 2-HOP QUERY FOR INDIRECT ACTIVATORS OF ~a:\n~a-->INCREASES-->~a-->INCREASES-->~a\n~a-->DECREASES-->~a-->DECREASES-->~a" sym-hgnc-ls filtered-X-drug filtered-X-molecular_entity sym-hgnc-ls filtered-X-drug filtered-X-molecular_entity sym-hgnc-ls))
+	  (newline)
+	  
+	  (match-define		 	
+	   (list b-inc-gene=>concepts b-inc-gene=>edges) 
+	   (time				
+	    (run/graph				
+	     ((B drugs)				
+	      (gene-upregulator-concept-ls/2-hop gene-upregulator-concept-ls/2-hop)) 
+	     ((B->inc increases))			
+	     (B B->inc gene-upregulator-concept-ls/2-hop))))	
        
+	  (match-define		 	
+	   (list f-dec-gene=>concepts f-dec-gene=>edges) 
+	   (time				
+	    (run/graph				
+	     ((F drugs)				
+	      (gene-downregulator-concept-ls/2-hop gene-downregulator-concept-ls/2-hop)) 
+	     ((F->dec decreases))			
+	     (F F->dec gene-downregulator-concept-ls/2-hop))))
+
+	 
+	  (define drug-upregulators-of-molecular-entity-inc-gene-ls (hash-ref b-inc-gene=>edges 'B->inc))
+
+	  (define drug-downregulators-of-molecular-entity-dec-gene-ls (hash-ref f-dec-gene=>edges 'F->dec)) 
+				
+ 	  (newline)			 	
+	  (displayln			 	
+	   (format "MATCHING INDIRECT ACTIVATOR EDGES:\n~a-->INCREASES-->~a-->INCREASES-->~a\n~a-->DECREASES-->~a-->DECREASES-->~a" filtered-X-drug filtered-X-molecular_entity sym-hgnc-ls filtered-X-drug filtered-X-molecular_entity sym-hgnc-ls)) 
+	  (newline)			 	
+
+       ;; drug->inc->gene->inc->[gene] export-edges
+	  #|       
+	  (define drug-inc-mol-entity-inc-gene/edge 
+	  (time				
+	  (remove-duplicates		       	
+	  (match-drug-pred-gene-edges	       	
+	  drug-upregulators-of-molecular-entity-inc-gene-ls '())))) |#
+ 
+	  (define drug-inc-mol-entity-inc-gene/edge 
+	    (time				
+	     (remove-duplicates		       	
+	      (match-drug-pred-gene-edges
+	       drug-upregulators-of-molecular-entity-inc-gene-ls '()))))
+	  #|
+	  (newline)
+	  (pretty-print drug-inc-mol-entity-inc-gene/edge)
+	  (newline)
+	  |#
+	  
+	  (define drug-dec-mol-entity-dec-gene/edge 
+	    (time				
+	     (remove-duplicates		       	
+	      (match-drug-pred-gene-edges     	
+	       drug-downregulators-of-molecular-entity-dec-gene-ls '())))) 
+	  #|
+	  (newline)
+	  (pretty-print drug-dec-mol-entity-dec-gene/edge)
+	  (newline)
+	  |#
+
+	  
+	  #|
+       (define drug-dec-mol-entity-dec-gene/edge 
+	 (time				
+ 	  (remove-duplicates		       	
+	   ((match-drug-pred-gene-edges
+	  drug-downregulators-of-molecular-entity-dec-gene-ls '()))))
+	  |#
+       
+	  (newline)
+	  (displayln (format "~a INDIRECT ACTIVATORS EDGES MATCHED! " (+ (length drug-downregulators-of-molecular-entity-dec-gene-ls) (length drug-upregulators-of-molecular-entity-inc-gene-ls)))) 
+	  (newline)
+	  
+	  (newline)			 	
+	  (displayln			 	
+	   (format "BEGINNING 2-HOP QUERY FOR INDIRECT INHIBITORS OF ~a:\n~a-->INCREASES-->~a-->DECREASES-->~a\n~a-->DECREASES-->~a-->INCREASES-->~a" sym-hgnc-ls filtered-X-drug filtered-X-molecular_entity sym-hgnc-ls filtered-X-drug filtered-X-molecular_entity sym-hgnc-ls))	
+	  (newline)			 	
+					
+	  (match-define		 	
+	   (list d-inc-gene=>concepts d-inc-gene=>edges) 
+	   (time			 	
+	    (run/graph			 	
+	     ((D drugs)			 	
+	      (gene-downregulator-concept-ls/2-hop gene-downregulator-concept-ls/2-hop)) 
+	     ((D->inc increases))	 		
+	     (D D->inc gene-downregulator-concept-ls/2-hop))))
+
+	  (match-define		 	
+	   (list j-dec-gene=>concepts j-dec-gene=>edges) 
+	   (time				
+	    (run/graph				
+	     ((J drugs)				
+	      (gene-downregulator-concept-ls/2-hop gene-downregulator-concept-ls/2-hop)) 
+	     ((J->dec decreases))			
+	     (J J->dec gene-downregulator-concept-ls/2-hop))))	
+	  
+	  (define drug-upregulators-of-molecular-entity-dec-gene-ls (hash-ref d-inc-gene=>edges 'D->inc)) 
+
+	  (define drug-downregulators-of-molecular-entity-inc-gene-ls (hash-ref j-dec-gene=>edges 'J->dec))
+	  
+	  (newline)			 	
+	  (displayln (format "MATCHING INDIRECT INHIBITOR EDGES:\n~a-->INCREASES-->~a-->DECREASES-->~a\n~a-->DECREASES-->~a-->INCREASES-->~a" filtered-X-drug filtered-X-molecular_entity sym-hgnc-ls filtered-X-drug filtered-X-molecular_entity sym-hgnc-ls)) 
+	  (newline)
+
+	  (define drug-inc-mol-entity-dec-gene/edge 
+	    (time				
+	     (remove-duplicates		       	
+	      (match-drug-pred-gene-edges
+	       drug-upregulators-of-molecular-entity-dec-gene-ls '()))))
+
+	  #|
+	  (newline)
+	  (pretty-print drug-inc-mol-entity-dec-gene/edge)
+	  (newline)
+	  |#
+	  
+	  (define drug-dec-mol-entity-inc-gene/edge 
+	    (time				
+	     (remove-duplicates		       	
+	      (match-drug-pred-gene-edges
+	       drug-downregulators-of-molecular-entity-inc-gene-ls '()))))
+
+	  #|
+	  (newline)
+	  (pretty-print drug-dec-mol-entity-inc-gene/edge)
+	  (newline)
+	  |#
+      
+	  (newline)				
+	  (displayln (format "~a INDIRECT INHIBITOR EDGES FOUND!" (+ (length drug-upregulators-of-molecular-entity-dec-gene-ls) (length drug-downregulators-of-molecular-entity-inc-gene-ls)))) 
+	  (newline)				
+                        	  	   
+	  (define direct+indirect-activator?
+	    (lambda (ls)
+	      (cond
+		((null? (flatten ls)) #f)
+		(else 
+		 (and
+		  (and
+		   (member? (list-ref ls 1) (flatten pure-drug-upregulator-ls/2-hop))
+		   (not (member? (list-ref ls 1) (flatten pure-drug-downregulator-ls/2-hop))))
+		  (and
+		   (or (member? (list-ref ls 1) (flatten drug-dec-mol-entity-dec-gene/edge))
+		       (member? (list-ref ls 1) (flatten drug-inc-mol-entity-inc-gene/edge)))
+		   (and
+		    (not (member? (list-ref ls 1) (flatten drug-inc-mol-entity-dec-gene/edge)))
+		    (not (member? (list-ref ls 1) (flatten drug-dec-mol-entity-inc-gene/edge))))))))))	
+	  
+	  ;; indirect inhibitor	  
+	  (define direct+indirect-inhibitor? 
+	    (lambda (ls)
+	      (cond
+		((null? (flatten ls)) #f)
+		(else
+		 (and
+		  (and
+		   (not (member? (list-ref ls 1) (flatten pure-drug-upregulator-ls/2-hop)))
+		   (member? (list-ref ls 1) (flatten pure-drug-downregulator-ls/2-hop)))
+		  (and 
+		   (and
+		    (not (member? (list-ref ls 1) (flatten drug-dec-mol-entity-dec-gene/edge)))
+		    (not (member? (list-ref ls 1) (flatten drug-inc-mol-entity-inc-gene/edge))))
+		   (or 
+		    (member? (list-ref ls 1) (flatten drug-inc-mol-entity-dec-gene/edge))
+		    (member? (list-ref ls 1) (flatten drug-dec-mol-entity-inc-gene/edge)))))))))
+	  
+	  ;; indirect activator
+	  (define indirect-activator?
+	    (lambda (ls)
+	      (cond 
+		((null? (flatten ls)) #f)
+		(else
+		 (and 
+		  (or (member? (list-ref ls 1) (flatten drug-dec-mol-entity-dec-gene/edge))
+		      (member? (list-ref ls 1) (flatten drug-inc-mol-entity-inc-gene/edge)))
+		  (and
+		   (not (member? (list-ref ls 1) (flatten drug-inc-mol-entity-dec-gene/edge)))
+		   (not (member? (list-ref ls 1) (flatten drug-dec-mol-entity-inc-gene/edge)))))))))
+
+	  ;; indirect inhibitor	  
+	  (define indirect-inhibitor? 
+	    (lambda (ls)
+	      (cond
+		((null? (flatten ls)) #f)
+		(else 
+		 (and 
+		  (and
+		   (not (member? (list-ref ls 1) (flatten drug-dec-mol-entity-dec-gene/edge)))
+		   (not (member? (list-ref ls 1) (flatten drug-inc-mol-entity-inc-gene/edge))))
+		  (or 
+		   (member? (list-ref ls 1) (flatten drug-inc-mol-entity-dec-gene/edge))
+		   (member? (list-ref ls 1) (flatten drug-dec-mol-entity-inc-gene/edge))))))))
+
+	  (define get-direct+indirect-activators
+	    (lambda (ls els)
+	      (cond
+		((null? ls) els)
+		((direct+indirect-activator? (car ls))
+		 (get-direct+indirect-activators
+		  (cdr ls)
+		  (cons (car ls) els)))
+		(else
+		 (get-direct+indirect-activators
+		  (cdr ls)
+		  els)))))
+	  
+	  (define get-indirect-activators
+	    (lambda (ls els)
+	      (cond
+		((null? ls) els)
+		((indirect-activator? (car ls))
+		  (get-indirect-activators
+		   (cdr ls)
+		   (cons (car ls) els)))
+		(else
+		 (get-indirect-activators
+		   (cdr ls)
+		   els)))))
+	  
+	  (define get-direct+indirect-inhibitors
+	    (lambda (ls els)
+	      (cond
+		((null? ls) els)
+		((direct+indirect-inhibitor? (car ls))
+		  (get-direct+indirect-inhibitors
+		   (cdr ls)
+		   (cons (car ls) els)))
+		(else
+		 (get-direct+indirect-inhibitors
+		   (cdr ls)
+		   els)))))
+
+	  (define get-indirect-inhibitors
+	    (lambda (ls els)
+	      (cond
+		((null? ls) els)
+		((indirect-inhibitor? (car ls))
+		  (get-indirect-inhibitors
+		   (cdr ls)
+		   (cons (car ls) els)))
+		(else
+		 (get-indirect-inhibitors
+		   (cdr ls)
+		   els)))))
+
+	  ;; append the activator / inhibitor edges
+
+	  (define indirect-activators/2-hop
+	    (append drug-inc-mol-entity-inc-gene/edge drug-dec-mol-entity-dec-gene/edge))
+
+	  (define indirect-inhibitors/2-hop
+	    (append drug-dec-mol-entity-inc-gene/edge drug-inc-mol-entity-dec-gene/edge))
+
+	  
+	  (define direct+indirect-activators/edge
+	    (get-direct+indirect-activators indirect-activators/2-hop '()))
+	  
+	  (define indirect-activators/edge
+	    (get-indirect-activators indirect-activators/2-hop '()))
+	     
+	  (define direct+indirect-inhibitors/edge
+	    (get-direct+indirect-inhibitors indirect-inhibitors/2-hop '()))
+	  
+	  (define indirect-inhibitors/edge
+	    (get-indirect-inhibitors indirect-inhibitors/2-hop '()))
+
+	  #|
+	  (newline)
+	  (displayln (format "DIRECT/INDIRECT ACTIVATOR EDGES FOR ~a" sym-hgnc-ls))
+	  (newline)
+	  (pretty-print direct+indirect-activators/edge)
+	  (newline)
+
+	  (displayln (format "INDIRECT ACTIVATOR EDGES FOR ~a" sym-hgnc-ls))
+	  (newline)
+	  (pretty-print indirect-activators/edge)
+	  (newline)
+	  
+	  (newline)
+	  (displayln (format "DIRECT/INDIRECT INHIBITOR EDGES FOR ~a" sym-hgnc-ls))
+	  (newline)
+	  (pretty-print direct+indirect-inhibitors/edge)
+	  (newline)
+
+	  (newline)
+	  (displayln (format "INDIRECT INHIBITOR EDGES FOR ~a" sym-hgnc-ls))
+	  (newline)
+	  (pretty-print indirect-inhibitors/edge)
+	  (newline)
+
+	  (newline)			 	
+	  (displayln "2-HOP QUERY EDGE MATCHING COMPLETE!\nBEGINNING EDGE EXPORT") 
+	  (newline)
+	  |#
+	  
+	  (export-column-headers (list pmi-ls) out-direct+indirect-activator direct+indirect-activator/path) 
+	  (export-column-headers COLUMN_HEADERS_INDIRECT_DRUGS out-direct+indirect-activator direct+indirect-activator/path) 
+	  
+	  (export-column-headers (list pmi-ls) out-indirect-activator indirect-activator/path) 
+	  (export-column-headers COLUMN_HEADERS_INDIRECT_DRUGS out-indirect-activator indirect-activator/path) 
+	  
+	  (export-column-headers (list pmi-ls) out-direct+indirect-inhibitor direct+indirect-inhibitor/path) 
+	  (export-column-headers COLUMN_HEADERS_INDIRECT_DRUGS out-direct+indirect-inhibitor direct+indirect-inhibitor/path) 
+	  
+	  (export-column-headers (list pmi-ls) out-indirect-inhibitor indirect-inhibitor/path) 
+	  (export-column-headers COLUMN_HEADERS_INDIRECT_DRUGS out-indirect-inhibitor indirect-inhibitor/path) 
+	  
+	  (define export_direct+indirect-activator
+	    (outer-loop direct+indirect-activators/edge
+			out-direct+indirect-activator))
+	  
+	  (define export_indirect-activator
+	    (outer-loop indirect-activators/edge
+			out-indirect-activator))
+	  
+	  (define export_direct+indirect-inhibitor
+	    (outer-loop direct+indirect-inhibitors/edge
+			out-direct+indirect-inhibitor))
+	  
+	  (define export_indirect-inhibitor
+	    (outer-loop indirect-inhibitors/edge
+			out-indirect-inhibitor))
+	  
+	  (newline)
+	  (displayln "1-HOP & 2-HOP QUERY EXPORTS COMPLETE!")
+	  (newline)
+
 	  (newline)
 	  (displayln (format "CASE ~s COMPLETE!" pmi-ls))
 	  (newline)
+       
+
 	  ))))))
 
 (start-function pmi-ls hgnc-id-ls sym-hgnc-ls)
 
 
+	  ;; map to get 1st 2 elements of all export edges
+	  
+	  #|
+	  ;;	  
+	  (define mol_entity-dec-o-xrefs
+	    (time
+	     (find-concepts
+	      #t
+	      (remove-duplicates
+	       (prune-xrefs
+		(flatten
+		 (get-concept-xrefs-from-edges molecular_entity-dec-gene-list '())) '())))))
+	  
+	  ;; test to see what goes into the query
+	  (displayln "MOL_ENTITY->inc->gene-xrefs!")
+
+	  (pretty-print
+	   (remove-duplicates
+	    (prune-xrefs
+	     (flatten
+	      (get-concept-xrefs-from-edges molecular_entity-inc-gene-list '())) '())))
+      
+	  (define mol_entity-inc-o-xrefs
+	    (time
+	     (find-concepts
+	      #t
+	      (remove-duplicates
+	       (prune-xrefs 
+		(flatten
+		 (get-concept-xrefs-from-edges molecular_entity-inc-gene-list '())) '())))))
+ 	|#
+	  
+
+
+	  #|
+	  ;;CHECKING FOR META-IDENTIFIER STRINGS LIKE GENES
+	  (displayln "MOL_ENTITY->dec->gene-xrefs!")
+	  (newline)
+	  |#
+	  
+	  #|
+	  (pretty-print
+	   (remove-duplicates
+	    (prune-xrefs
+	     (flatten
+	      (get-concept-xrefs-from-edges molecular_entity-dec-gene-list '())) '())))
+	  
+	  
+	  (newline)
+	  (displayln "FROM EXPORT! MOL_ENTITY->dec->gene-xrefs!")
+	  (newline)
+	  |#
+
 
 #|
-  (newline)
-  (displayln "1-HOP & 2-HOP QUERIES COMPLETE!")
-  (newline)
-(newline)
-(display (format "TOTAL RUN TIME:" ))
-(newline)
+
 |#
+
+
+	  
+	  #|
+	  (define make-pure-gene-downregulator-ls/2-hop
+	    (lambda (ls els)
+	      (cond
+		((null? ls) els)
+		((pure-gene-downregulator? (car ls))
+		 (make-pure-gene-downregulator-ls/2-hop
+		  (cdr ls)
+		  (cons (car ls) els)))
+		(else
+		 (make-pure-gene-downregulator-ls/2-hop (cdr ls) els)))))
+	  |#
+	 
+#|
+	  (define pure-gene-downregulator-ls/2-hop
+	    (make-pure-gene-downregulator-ls/2-hop mol_entity-dec-o/edge '()))
+
+	  (define make-pure-gene-upregulator-ls/2-hop
+	    (lambda (ls els)
+	      (cond
+		((null? ls) els)
+		((pure-gene-upregulator? (list (car ls)))
+		 (make-pure-gene-upregulator-ls/2-hop
+		  (cdr ls)
+		  (cons (car ls) els)))
+		(else
+		 (make-pure-gene-upregulator-ls/2-hop (cdr ls) els)))))
+
+	  (define pure-gene-upregulator-ls/2-hop
+	    (make-pure-gene-upregulator-ls/2-hop mol_entity-inc-o/edge '()))
+|#
+	  
+	  
+	  #|;;for printing
+	  (define gene-upregulator-aliases/external-ids
+	    (remove-duplicates 
+	      (prune-xrefs/outliers
+	       (flatten
+		(get-concept-xrefs/2-hop
+		 (query-with-curie/str
+		  (flatten
+		   (map (lambda (ls)
+			  (cons 
+			   (cadr ls) '()))
+			mol_entity-dec-o/edge)) '()) '())) '())))
+
+	  
+	  ;;for printing
+	  (define gene-downregulator-aliases/external-ids
+	    (remove-duplicates 
+	     (prune-xrefs/outliers
+	      (flatten
+	       (get-concept-xrefs/2-hop
+		(query-with-curie/str
+		  (flatten
+		   (map (lambda (ls)
+			  (cons 
+			   (cadr ls) '()))
+			mol_entity-dec-o/edge)) '()) '())) '())))
+	  |#
+	  
+
+	  #|;;for run/graph
+	  (define gene-upregulator-concept-ls/2-hop
+	    (query-with-curie/str
+	     (remove-duplicates 
+	      (prune-xrefs/outliers
+	       (flatten
+		(get-concept-xrefs/2-hop
+		 (query-with-curie/str
+		  (flatten
+		   (map (lambda (ls)
+			  (cons 
+			   (cadr ls) '()))
+			mol_entity-inc-o/edge)) '()) '())) '())) '()))
+
+
+	  ;;for run/graph
+	  (define gene-downregulator-concept-ls/2-hop
+	    (query-with-curie/str
+	     (remove-duplicates 
+	      (prune-xrefs/outliers
+	       (flatten
+		(get-concept-xrefs/2-hop
+		 (query-with-curie/str
+		  (flatten
+		   (map (lambda (ls)
+			  (cons 
+			   (cadr ls) '()))
+			mol_entity-dec-o/edge)) '()) '())) '())) '())) |#
 
 
 
@@ -2465,383 +4150,6 @@ as state-machine
 	 )))))
 
 |#
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-       #|
-
-
-	    #|(drug-dec-molecular_entity->inc->gene/path
-	    (format "~a~a_drug_dec_molecular_entity_upregulates_~a" export-path pmi-ls sym-hgnc-ls)) ;
-	    (drug-inc-molecular_entity->dec->gene/path ;
-	    (format "~a~a_drug_inc_molecular_entity_downregulates_~a" export-path pmi-ls sym-hgnc-ls)) ;
-	    (drug-dec-molecular_entity->dec->gene/path ;
-	    (format "~a~a_drug_dec_molecular_entity_downregulates_~a" export-path pmi-ls sym-hgnc-ls)) ;
-	    (drug-inc-molecular_entity->inc->gene/path ;
-	    (format "~a~a_drug_inc_molecular_entity_upregulates_~a" export-path pmi-ls sym-hgnc-ls)) ;
- 	    (out-drug-dec-molecular_entity->inc->gene ;
-	    (open-output-file drug-dec-molecular_entity->inc->gene/path #:exists 'replace)) ;
-	    (out-drug-inc-molecular_entity->dec->gene ;
-	    (open-output-file drug-inc-molecular_entity->dec->gene/path #:exists 'replace)) ;
-	    (out-drug-dec-molecular_entity->dec->gene ;
-	    (open-output-file drug-dec-molecular_entity->dec->gene/path #:exists 'replace)) ;
-	    (out-drug-inc-molecular_entity->inc->gene ;
-	    (open-output-file drug-inc-molecular_entity->inc->gene/path #:exists 'replace))|#
-       (newline)
-       (displayln (format "GATHERING ALIASES & EXTERNAL-REFERENCES\nFOR ~a REGULATORS OF ~a" filtered-X-molecular_entity sym-hgnc-ls))
-       (newline)
-
-       ;; CHECKING FOR META-IDENTIFIER STRINGS LIKE GENES
-       (displayln "MOL_ENTITY->dec->gene-xrefs!")
-       (pretty-print
-	(remove-duplicates
-	 (prune-xrefs
-	  (flatten
- 	   (get-concept-xrefs-from-edges molecular_entity-dec-gene-list '())) '())))
-
-       #|
-       (define mol_entity-dec-o-xrefs
-	 (time
-	  (find-concepts/options
-	   #f #f 0 #f 
-	   (remove-duplicates
-	    (prune-xrefs
-	     (flatten
-	      (get-concept-xrefs-from-edges molecular_entity-dec-gene-list '())) '())))))
-       |#
-       
-       ;; test to see what goes into the query
-       (displayln "MOL_ENTITY->inc->gene-xrefs!")
-       (pretty-print
-	(remove-duplicates
-	 (prune-xrefs
-	  (flatten
-	   (get-concept-xrefs-from-edges molecular_entity-inc-gene-list '())) '())))
-      #|
-       (define mol_entity-inc-o-xrefs
-	 (time
-	  (find-concepts/options
-	   #f #f 0 #f 
-	   (remove-duplicates
-	    (prune-xrefs 
-	     (flatten
-	      (get-concept-xrefs-from-edges molecular_entity-inc-gene-list '())) '())))))
-       |#
-       |#
-
-   #|
-       ;;CODE FOR 2-HOP LOOKUPS		;
-	    ;;NEED TO PRUNE OUT META IDENTIFIERS LIKE "GENE" FROM XREF-GATHERED LIST, 8 hr run didnt get past drug inc ;
-	    ;; gene inc gene....	;
-					;
-	    				;
-   (newline)				;
-   (displayln (format "~a ALIASES/EXTERNAL-IDENTIFIERS FOUND\n~a ACTIVATORS OF ~a" (length mol_entity-inc-o-xrefs) filtered-X-molecular_entity sym-hgnc-ls)) ;
-   (newline)				;
-	    				;
-   (newline)				;
-   (displayln (format "~a ALIASES/EXTERNAL-IDENTIFIERS FOUND\n~a INHIBITORS OF ~a" (length mol_entity-dec-o-xrefs) filtered-X-molecular_entity sym-hgnc-ls)) ;
-   (newline)				;
-	    				;
-   (newline)			 	;
-   (displayln			 	;
-   (format "BEGINNING RUN/GRAPH 2-HOP:\n~a-->INCREASES-->~a-->INCREASES-->~a" filtered-X-drug filtered-X-molecular_entity sym-hgnc-ls))	;
-   (newline)			 	;
-					;
-   (match-define		 	;
-   (list b-inc-gene=>concepts b-inc-gene=>edges) ;
-   (time				;
-   (run/graph				;
-   ((B drugs)				;
-   (mol_entity-inc-o-xrefs mol_entity-inc-o-xrefs)) ;
-   ((B->inc increases))			;
-   (B B->inc mol_entity-inc-o-xrefs))))	;
-					;
-   (define drug-upregulators-of-molecular-entity-inc-gene-ls (hash-ref b-inc-gene=>edges 'B->inc)) ;
-					;
-   (newline)				;
-   (displayln (format "~a INDIRECT ACTIVATORS EDGES FOUND! " (length drug-upregulators-of-molecular-entity-inc-gene-ls))) ;
-   (newline)				;
-					;
-	    ;; consider pruning down these edges based on whether they contain ;
-	    ;; drugs that are not FDA approved at the point of edge collection ;
-	    ;; function idea --> edge-pruner, if edge doesnt contain umls status/drug-bank status/rx-norm status ;
-	    ;; then discard it.		;
-	    ;; if edge concept exists on a drug->inc-gene or drug-dec-gene list already, keep it. ;
-	    ;; if drug is a down-regulator of genes that upregulate gene and a downregulate of the target gene ;
-	    ;; we can give it "super downregulator" status. ;
-					;
-   #|(displayln "drug->inc->MOL_ENTITY->inc->gene-xrefs!") ;
-   (pretty-print			;
-   (remove-duplicates			;
-   (prune-xrefs				;
-   (flatten				;
-   (get-concept-xrefs-from-edges drug-upregulators-of-molecular-entity-inc-gene-ls '())) '())))|# ;
-					;
-   (newline)			 	;
-   (displayln			 	;
-   (format "MATCHING:\n~a-->INCREASES-->~a-->INCREASES-->~a" filtered-X-drug filtered-X-molecular_entity sym-hgnc-ls)) ;
-   (newline)			 	;
-					;
-   (define drug-inc-mol-entity-inc-gene/edge ;
-   (time				;
-   (remove-duplicates		       	;
-   (match-drug-pred-gene-edges	       	;
-   drug-upregulators-of-molecular-entity-inc-gene-ls '())))) ;
-	    				;
-					;
-   (newline)			 	;
-   (displayln			 	;
-   (format "BEGINNING RUN/GRAPH 2-HOP:\n~a-->DECREASES-->~a-->INCREASES-->GENE" filtered-X-drug filtered-X-molecular_entity)) ;
-   (newline)			 	;
-					;
-   (match-define		 	;
-   (list j-dec-gene=>concepts j-dec-gene=>edges) ;
-   (time				;
-   (run/graph				;
-   ((J drugs)				;
-   (mol_entity-inc-o-xrefs mol_entity-inc-o-xrefs)) ;
-   ((J->dec decreases))			;
-   (J J->dec mol_entity-inc-o-xrefs))))	;
-					;
-   (define drug-downregulators-of-molecular-entity-inc-gene-ls (hash-ref j-dec-gene=>edges 'J->dec)) ;
-					;
-   (displayln "drug->dec->MOL_ENTITY->inc->gene-xrefs!") ;
-   (pretty-print			;
-   (remove-duplicates			;
-   (prune-xrefs				;
-   (flatten				;
-   (get-concept-xrefs-from-edges drug-downregulators-of-molecular-entity-inc-gene-ls '())) '()))) ;
-					;
-					;
-   (newline)			 	;
-   (displayln			 	;
-   (format "MATCHING:\n~a-->DECREASES-->~a-->INCREASES-->GENE" filtered-X-drug filtered-X-molecular_entity)) ;
-   (newline)			 	;
-					;
-   (define drug-dec-mol-entity-inc-gene/edge ;
-   (time				;
-   (remove-duplicates		       	;
-   (match-drug-pred-gene-edges	       	;
-   drug-downregulators-of-molecular-entity-inc-gene-ls '())))) ;
-					;
-					;
-   (newline)			 	;
-   (displayln			 	;
-   (format "BEGINNING RUN/GRAPH 2-HOP:\n~a-->INCREASES-->~a-->DECREASES-->~a" filtered-X-drug filtered-X-molecular_entity sym-hgnc-ls))	;
-   (newline)			 	;
-					;
-   (match-define		 	;
-   (list d-inc-gene=>concepts d-inc-gene=>edges) ;
-   (time			 	;
-   (run/graph			 	;
-   ((D drugs)			 	;
-   (mol_entity-dec-o-xrefs mol_entity-dec-o-xrefs)) ;
-   ((D->inc increases))	 		;
-   (D D->inc mol_entity-dec-o-xrefs))))	;
-					;
-   (define drug-upregulators-of-molecular-entity-dec-gene-ls (hash-ref d-inc-gene=>edges 'D->inc)) ;
-					;
-					;
-   (newline)			 	;
-   (displayln (format "MATCHING\n~a-->INCREASES-->~a-->DECREASES-->~a" filtered-X-drug filtered-X-molecular_entity sym-hgnc-ls)) ;
-   (newline)			 	;
-					;
-   (define drug-inc-mol-entity-dec-gene/edge ;
-   (time				;
-   (remove-duplicates		       	;
-   (match-drug-pred-gene-edges	       	;
-   drug-upregulators-of-molecular-entity-dec-gene-ls '())))) ;
-					;
-   (newline)			 	;
-   (displayln			 	;
-   (format "BEGINNING RUN/GRAPH 2-HOP:\n~a-->DECREASES-->~a-->DECREASES-->~a" filtered-X-drug filtered-X-molecular_entity sym-hgnc-ls))	;
-   (newline)			 	;
-					;
-   (match-define		 	;
-   (list f-dec-gene=>concepts f-dec-gene=>edges) ;
-   (time				;
-   (run/graph				;
-   ((F drugs)				;
-   (mol_entity-dec-o-xrefs mol_entity-dec-o-xrefs)) ;
-   ((F->dec decreases))			;
-   (F F->dec mol_entity-dec-o-xrefs))))	;
-					;
-   (define drug-downregulators-of-molecular-entity-dec-gene-ls (hash-ref f-dec-gene=>edges 'F->dec)) ;
-					;
-   (newline)			 	;
-   (displayln (format "MATCHING\n~a-->DECREASES-->~a-->DECREASES-->~a" filtered-X-drug filtered-X-molecular_entity sym-hgnc-ls)) ;
-   (newline)			 	;
-					;
-   (define drug-dec-mol-entity-dec-gene/edge ;
-   (time				;
-   (remove-duplicates		       	;
-   (match-drug-pred-gene-edges	       	;
-   drug-downregulators-of-molecular-entity-dec-gene-ls '())))) ;
-					;
-   (newline)			 	;
-   (displayln "MATCHING COMPLETE!\n BEGINNING EDGE EXPORT") ;
-   (newline)			 	;
-					;
-   (define drug-dec-mol-entitiy-dec-gene-pure-indirect-upregulator? ;
-   (lambda (ls)		 		;
-   (and (member? (list-ref ls 1) (flatten drug-dec-mol-entity-dec-gene/edge)) ;
-   (not (member? (list-ref ls 1) (flatten drug-dec-mol-entity-inc-gene/edge))) ;
-   (not (member? (list-ref ls 1) (flatten drug-inc-mol-entity-dec-gene/edge)))))) ;
-					;
-   (define drug-inc-mol-entity-inc-gene-pure-indirect-upregulator? ;
-   (lambda (ls)		 		;
-   (and (member? (list-ref ls 1) (flatten drug-inc-mol-entity-inc-gene/edge)) ;
-   (not (member? (list-ref ls 1) (flatten drug-dec-mol-entity-inc-gene/edge))) ;
-   (not (member? (list-ref ls 1) (flatten drug-inc-mol-entity-dec-gene/edge)))))) ;
-					;
-   (define drug-inc-mol-entity-dec-gene-pure-indirect-downregulator? ;
-   (lambda (ls)		 		;
-   (and (member? (list-ref ls 1) (flatten drug-inc-mol-entity-dec-gene/edge)) ;
-   (not (member? (list-ref ls 1) (flatten drug-inc-mol-entity-inc-gene/edge))) ;
-   (not (member? (list-ref ls 1) (flatten drug-dec-mol-entity-dec-gene/edge)))))) ;
-					;
-   (define drug-dec-mol-entity-inc-gene-pure-indirect-downregulator? ;
-   (lambda (ls)		 		;
-   (and (member? (list-ref ls 1) (flatten drug-dec-mol-entity-inc-gene/edge)) ;
-   (not (member? (list-ref ls 1) (flatten drug-inc-mol-entity-inc-gene/edge))) ;
-   (not (member? (list-ref ls 1) (flatten drug-dec-mol-entity-dec-gene/edge)))))) ;
-					;
-       					;
-       ;;; indirect downregulators	;
-       ;; port1 = out-drug-inc-molecular_entity->dec->gene ;
-       ;; drug-inc-mol-entity-dec-gene-pure-indirect-downregulator? ;
-       ;;       = out-drug-dec-molecular_entity->inc->gene ;
-       ;; drug-dec-mol-entity-inc-gene-pure-indirect-downregulator? ;
-       					;
-       ;;; indirect upregulators	;
-       ;; port2 = out-drug-inc-molecular_entity->inc->gene ;
-       ;; drug-inc-mol-entity-inc-gene-pure-indirect-upregulator? ;
-       ;;       = out-drug-dec-molecular_entity->dec->gene ;
-       ;; drug-dec-mol-entitiy-dec-gene-pure-indirect-upregulator? ;
-					;
-   (define outer-loop/indirect-regulators ;
-   (lambda (ls port1 port2 port3 port4)	;
-   (cond				;
-   ((null? ls)				;
-   (close-output-port port1)		;
-   (close-output-port port2)		;
-   (close-output-port port3)		;
-   (close-output-port port4))		;
-   ((not (pure-drug-upregulator? (car ls))) ;
-   (cond				;
-   ((drug-inc-mol-entity-dec-gene-pure-indirect-downregulator? (car ls)) ;
-   (inner-loop (car ls) port1)	       	;
-   (fprintf port1 (format "~c" #\newline)) ;
-   (outer-loop/indirect-regulators (cdr ls) port1 port2 port3 port4)) ;
-   ((drug-dec-mol-entity-inc-gene-pure-indirect-downregulator? (car ls)) ;
-   (inner-loop (car ls) port2)	       	;
-   (fprintf port2 (format "~c" #\newline)) ;
-   (outer-loop/indirect-regulators (cdr ls) port1 port2 port3 port4)) ;
-   (else		 		;
-   (outer-loop/indirect-regulators (cdr ls) port1 port2 port3 port4))))	;
-   ((not (pure-drug-downregulator? (car ls))) ;
-   (cond				;
-   ((drug-inc-mol-entity-inc-gene-pure-indirect-upregulator? (car ls)) ;
-   (inner-loop (car ls) port3)	       	;
-   (fprintf port3 (format "~c" #\newline)) ;
-   (outer-loop/indirect-regulators (cdr ls) port1 port2 port3 port4)) ;
-   ((drug-dec-mol-entitiy-dec-gene-pure-indirect-upregulator? (car ls))	;
-   (inner-loop (car ls) port4)  	;
-   (outer-loop/indirect-regulators (cdr ls) port1 port2 port3 port4))))	;
-   (else			 	;
-   (outer-loop/indirect-regulators (cdr ls) port1 port2 port3 port4))))) ;
-					;
-					;
-					;
-   (export-column-headers (list pmi-ls) out-drug-dec-molecular_entity->inc->gene) ;
-   (export-column-headers COLUMN_HEADERS_INDIRECT_DRUGS out-drug-dec-molecular_entity->inc->gene) ;
-					;
-   (export-column-headers (list pmi-ls) out-drug-inc-molecular_entity->dec->gene) ;
-   (export-column-headers COLUMN_HEADERS_INDIRECT_DRUGS out-drug-inc-molecular_entity->dec->gene) ;
-					;
-   (export-column-headers (list pmi-ls) out-drug-dec-molecular_entity->dec->gene) ;
-   (export-column-headers COLUMN_HEADERS_INDIRECT_DRUGS out-drug-dec-molecular_entity->dec->gene) ;
-					;
-   (export-column-headers (list pmi-ls) out-drug-inc-molecular_entity->inc->gene) ;
-   (export-column-headers COLUMN_HEADERS_INDIRECT_DRUGS out-drug-inc-molecular_entity->inc->gene) ;
-					;
-					;
-   (define export_pure_indirect_upregulators_drug->inc->mol-entity->inc->gene ;
-   (outer-loop/indirect-regulators	;
-   drug-inc-mol-entity-inc-gene/edge	;
-   out-drug-inc-molecular_entity->dec->gene ;
-   out-drug-dec-molecular_entity->inc->gene ;
-   out-drug-inc-molecular_entity->inc->gene ;
-   out-drug-dec-molecular_entity->dec->gene)) ;
-					;
-   (define export_pure_indirect_upregulators_drug->dec->mol-entity->dec-gene ;
-   (outer-loop/indirect-regulators	;
-   drug-dec-mol-entity-dec-gene/edge	;
-   out-drug-inc-molecular_entity->dec->gene ;
-   out-drug-dec-molecular_entity->inc->gene ;
-   out-drug-inc-molecular_entity->inc->gene ;
-   out-drug-dec-molecular_entity->dec->gene)) ;
-					;
-   (define export_pure_indirect_downregulators_drug->dec->mol-entity->inc->gene	;
-   (outer-loop/indirect-regulators	;
-   drug-dec-mol-entity-inc-gene/edge	;
-   out-drug-inc-molecular_entity->dec->gene ;
-   out-drug-dec-molecular_entity->inc->gene ;
-   out-drug-inc-molecular_entity->inc->gene ;
-   out-drug-dec-molecular_entity->dec->gene)) ;
-					;
-   (define export_pure_indirect_downregulators_drug->inc->mol-entity->dec-gene ;
-   (outer-loop/indirect-regulators	;
-   drug-inc-mol-entity-dec-gene/edge	;
-   out-drug-inc-molecular_entity->dec->gene ;
-   out-drug-dec-molecular_entity->inc->gene ;
-   out-drug-inc-molecular_entity->inc->gene ;
-   out-drug-dec-molecular_entity->dec->gene)) ;
-					;
-	    				;
-       |#
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
