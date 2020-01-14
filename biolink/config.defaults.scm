@@ -16,6 +16,8 @@
  ;(query-results.file-mode       . append)  ;; Save all the queries.
  (initial-window-size.horizontal . 800)
  (initial-window-size.vertical . 400)
+
+
  (decreases-predicate-names
   .
   ("negatively_regulates"
@@ -68,6 +70,6 @@
    ;; "predisposes"
    ;; "decreases_metabolic_processing_of"
    ))
- 
+ ("automated_query_path" . "/home/mjpatton/PhD/CaseReviews/automated_medikanren_queries/")
  ;; Add configuration options as new association pairs.
  )
