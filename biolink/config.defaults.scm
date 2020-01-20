@@ -70,6 +70,7 @@
    ;; "predisposes"
    ;; "decreases_metabolic_processing_of"
    ))
- ("automated_query_path" . "/home/mjpatton/PhD/CaseReviews/automated_medikanren_queries/")
+ ("automated_query_export_path" . "/home/mjpatton/PhD/CaseReviews/automated_medikanren_queries/")
+ ("automated_query_input_path" . "/home/mjpatton/PhD/CaseReviews/test_prototype_files/")
  ;; Add configuration options as new association pairs.
  )
