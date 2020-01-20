@@ -596,13 +596,7 @@
       (else
        (void)))))
 |#
-
-(define check-concept-to-edge-match
-  (lambda (edge-ls matched-edge-ls)
-    (if (= (length edge-ls) (length matched-edge-ls))
-        (displayln (format "\nALL EDGES SUCCESSFULLY MATCHED FOR EXPORT!\n"))
-        (displayln (format "\nEXPORTED EDGES MAY CONTAIN DUPLICATE ENTRIES!\n")))))
-
+ 
 (define start-function
   (time 
    (lambda (pmi-case-number-ls
@@ -811,10 +805,6 @@
 	     (remove-duplicates
 	      (match-drug-pred-gene-edges
 	       molecular_entity-dec-gene-list/edges '()))))
-	  
-	  (check-concept-to-edge-match
-	   molecular_entity-dec-gene-list/edges
-	   mol_entity-dec-o/export-edges)
 
 	  (newline)
 	  (displayln (format "BEGINNING 1-HOP QUERY FOR ~a:\n[~a] --> ACTIVATES/INCREASES EXPRESSION OF --> ~a" genetic_variant-name-ls filtered-X-molecular_entity genetic_variant-name-ls))
@@ -847,10 +837,6 @@
 	      (match-drug-pred-gene-edges
 	       molecular_entity-inc-gene-list/edges '()))))
 		 
-	  (check-concept-to-edge-match
-	   molecular_entity-inc-gene-list/edges
-	   mol_entity-inc-o/export-edges)
-
 	  (define mol_entity-up+down-regulators-for-target-gene/export-edges
 	    (append (remove-duplicates mol_entity-dec-o/export-edges) (remove-duplicates mol_entity-inc-o/export-edges)))
 	  
@@ -909,7 +895,6 @@
 	  (displayln (format "PATTERN-MATCHING EDGES:\n[[~a]] --> INHIBITS/DECREASES EXPRESSION OF --> [~a] --> INHIBITS/DECREASES EXPRESSION OF --> ~a" filtered-X-drug filtered-X-molecular_entity genetic_variant-name-ls))
 	  (newline)
           
-
 	  (define drug-dec-molecular-entity-inhibitors/export-edges
 	    (time
 	     (remove-duplicates
@@ -1081,10 +1066,6 @@
 	      (match-drug-pred-gene-edges
 	       drug-dec-gene-list/edges '()))))
 
-	  (check-concept-to-edge-match
-           drug-dec-gene-list/edges
-           drug-dec-o/export-edges)
-
 	  (newline)
 	  (displayln (format "BEGINNING 1-HOP QUERY FOR ~a:\n [~a] --> ACTIVATES/INCREASES EXPRESSION OF --> ~a" genetic_variant-name-ls filtered-X-drug genetic_variant-name-ls))
 	  (newline)
@@ -1113,10 +1094,6 @@
 	     (remove-duplicates
 	      (match-drug-pred-gene-edges
 	       drug-inc-gene-list/edges '()))))
-
-	  (check-concept-to-edge-match
-	   drug-inc-gene-list/edges
-           drug-inc-o/export-edges)
 
 	  (define direct-drug-activators/inhibitors-of-target-gene
 	    (append (remove-duplicates drug-dec-o/export-edges) (remove-duplicates drug-inc-o/export-edges)))
@@ -1233,10 +1210,6 @@
 	     (remove-duplicates
 	      (match-drug-pred-gene-edges
 	       disease_associated_with_gene-list/edges '()))))
-	  	  
-	  (check-concept-to-edge-match
-	   disease_associated_with_gene-list/edges
-	   disease_associated_with_gene-list/export-edges)
 
 	  (newline)
 	  (displayln (format "BEGINNING DISEASE-TO-GENE ASSOCIATION QUERY FOR ~a:\n[~a] --> INHIBITS/DECREASES EXPRESSION OF --> ~a" genetic_variant-name-ls filtered-X-disease genetic_variant-name-ls))
@@ -1266,10 +1239,6 @@
 	     (remove-duplicates
 	      (match-drug-pred-gene-edges
 	       disease_dec_gene-list/edges '()))))
-
-	  (check-concept-to-edge-match
-	   disease_dec_gene-list/edges
-	   disease_dec_gene-list/export-edges)
 
 	  (define disease_associated_with_and_inhibits_target-gene/export-edges
 	    (append disease_associated_with_gene-list/export-edges
@@ -1317,10 +1286,6 @@
 	     (remove-duplicates
 	      (match-drug-pred-gene-edges
 	       total_LOF_gene-decreases-molecular_entity-list/edges '()))))
-
-          (check-concept-to-edge-match
-	   total_LOF_gene-decreases-molecular_entity-list/edges
-	   total_LOF_gene-decreases-molecular_entity-list/export-edges)
 
 	  (newline)
 	  (displayln (format "BEGINNING 1-HOP QUERY FOR ~a:\n~a --> ACTIVATES/INCREASES EXPRESSION OF --> [~a]" genetic_variant-name-ls genetic_variant-name-ls filtered-X-molecular_entity))
@@ -1470,10 +1435,6 @@
 	     (remove-duplicates
 	      (match-drug-pred-gene-edges
 	       gene_associated_with_disease-list/edges '()))))
-	  	  
-	  (check-concept-to-edge-match
-	   gene_associated_with_disease-list/edges
-	   gene_associated_with_disease-list/export-edges)
 
 	  (newline)
 	  (displayln (format "BEGINNING DISEASE/SYMPTOM QUERY FOR ~a:\n~a --> DECREASES/PREVENTS/TREATS --> [~a]" genetic_variant-name-ls genetic_variant-name-ls filtered-X-disease))
@@ -1504,9 +1465,6 @@
 	      (match-drug-pred-gene-edges
 	       gene_decreases/prevents_disease-list/edges '()))))
 
-	  (check-concept-to-edge-match
-	   gene_decreases/prevents_disease-list/edges
-	   gene_decreases/prevents_disease-list/export-edges)
 
 	  (define gene_associated-with_and_decreases/prevents_disease-list/export-edges
 	    (append gene_decreases/prevents_disease-list/export-edges
