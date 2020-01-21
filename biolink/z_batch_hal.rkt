@@ -46,110 +46,47 @@
           (validate-header header-expected in)
           (csv->list (make-csv-reader in))))))
 
-(define build-concepts/inner-loop
+(define index-of-field
+  (lambda (header-names field-name)
+    (index-of header-names field-name)))
+
+;; transposition 
+(define make-association-ls
   (lambda (ls)
-    (list
-     (cons
-      (list-ref pmi-patient-record-headers 0)
-      (list-ref ls 0))
-     (cons
-      (list-ref pmi-patient-record-headers 1)
-      (list-ref ls 1))
-     (cons
-      (list-ref pmi-patient-record-headers 2)
-      (list-ref ls 2))
-     (cons
-      (list-ref pmi-patient-record-headers 3)
-      (list-ref ls 3))
-     (cons
-      (list-ref pmi-patient-record-headers 4)
-      (list-ref ls 4))
-     (cons
-      (list-ref pmi-patient-record-headers 5)
-      (list-ref ls 5))
-     (cons
-      (list-ref pmi-patient-record-headers 6)
-      (list-ref ls 6))
-     (cons
-      (list-ref pmi-patient-record-headers 7)
-      (list-ref ls 7))
-     (cons
-      (list-ref pmi-patient-record-headers 8)
-      (list-ref ls 8)))))
+    (map (lambda (header-name index)
+           (cons header-name (list-ref ls 
+                                       #;(index-of-field pmi-patient-record-headers header-name)
+                                       index)))
+         pmi-patient-record-headers (range (length pmi-patient-record-headers)))))
 
-(define build-concepts
-  (lambda (ls els)
-    (cond
-      ((null? ls) (reverse els))
-      (else 
-       (build-concepts
-        (cdr ls)
-        (cons (build-concepts/inner-loop (car ls)) els))))))
+(define pmi-assoc-ls
+  (map make-association-ls pmi-records))
 
-(define remove-item
-  (lambda (x ls els)
-    (cond
-      ((null? ls) (reverse els))
-      ((equal? x (car ls))
-       (remove-item x (cdr ls) els))
-      (else
-       (remove-item x (cdr ls)
-                    (cons (car ls) els))))))
+;; (apply map list pmi-assoc-ls) is transposition of list
+;; need state and bucket and previous-buckets
+(define lookup-field
+  (lambda (row field-name)
+    (cdr (assoc field-name row))))
 
-(define build-curie
-  (lambda (ls assoc-key)    
-    (remove-item
-     "N/A"
-     (map cdr (map (lambda (ls) (assoc assoc-key ls)) ls)) '())))
+(define group-by
+  (lambda (rows field-to-group-by)    
+    (define final-state 
+      (foldl (lambda (row state)
+               (define id (car state))
+               (define current-bucket (cadr state))
+               (define previous-buckets (caddr state))
+               (define current-id (lookup-field row field-to-group-by))
+               (cond
+                 ((equal? id current-id)            
+                  (list id (cons row current-bucket) previous-buckets))
+                 (else
+                  (list current-id (list row) (cons (reverse current-bucket) previous-buckets)))))
+             (list (lookup-field (car rows) field-to-group-by) '() '()) rows))
+    (reverse (cons (cadr final-state) (caddr final-state)))))
 
-#|CONVERTS ROWS OF INPUT FILE INTO ASSOCIATION LIST FOR EACH PAITENT RECORD|#
+(define record-assoc-ls
+  (group-by pmi-assoc-ls "pmi_id"))
 
-(define pmi-patient-concept-association-ls
-  (build-concepts
-   pmi-records
-   '()))
-
-(define record-id-ls
-  (map (lambda (ls)
-         (assoc "pmi_id" ls)) pmi-patient-concept-association-ls))
-
-(define pmi-case-number-ls
-  (build-curie pmi-patient-concept-association-ls "pmi_id"))
-(define symptom-name-ls
-  (build-curie pmi-patient-concept-association-ls "symptom"))
-(define symptom-curie-ls
-  (build-curie pmi-patient-concept-association-ls "symptom_id"))
-(define diagnosis-name-ls
-  (build-curie pmi-patient-concept-association-ls "diagnosis"))
-(define diagnosis-curie-ls
-  (build-curie pmi-patient-concept-association-ls "diagnosis_id"))
-(define medication-name-ls
-  (build-curie pmi-patient-concept-association-ls "medication"))
-(define medication-curie-ls
-  (build-curie pmi-patient-concept-association-ls "medication_id"))
-(define genetic_variant-name-ls
-  (build-curie pmi-patient-concept-association-ls "genetic_variant"))
-(define genetic_variant-curie-ls
-  (build-curie pmi-patient-concept-association-ls "genetic_variant_id"))
-
-(define hgnc-symbol/id-pair
-  (lambda (ls1 ls2 els)
-    (cond
-      ((and (null? ls1)
-            (null? ls2))
-       els)
-      (else
-       (hgnc-symbol/id-pair
-        (cdr ls1) (cdr ls2)
-        (cons
-         (cons (car ls1)
-               (car ls2)) els))))))
-
-(define hgnc-symbol/pair-from-input
-  (hgnc-symbol/id-pair
-   genetic_variant-name-ls
-   genetic_variant-curie-ls '()))
- 
 (define extract-symbol-name-from-concept-or-edge
   (lambda (query-ls els)
     (cond
@@ -169,31 +106,11 @@
                                   (set-union
                                    (list subject-name) els))])))))
 
-(newline)
-(displayln
- (format "~a PREPARED FOR AUTOMATED 1 & 2-HOP QUERIES" (car pmi-case-number-ls)))
-(newline)
-(newline)
-(displayln
- (format "SYMPTOM NAMES & CURIE-IDS FOR ~a:\n\nNAME(S): ~a \n\nCURIE(S): ~a" (car pmi-case-number-ls)
-          symptom-name-ls symptom-curie-ls))
-(newline)
-(newline)
-(displayln
- (format "MEDICATION NAMES & CURIE-IDS FOR ~a:\n\nNAME(S): ~a \n\nCURIE(S): ~a" (car pmi-case-number-ls)
-          medication-name-ls medication-curie-ls))
-(newline)
-(newline)
-(displayln
- (format "DIAGNOSIS NAMES & CURIE-IDS FOR ~a:\n\nNAME(S): ~a \n\nCURIE(S): ~a" (car pmi-case-number-ls)
-         diagnosis-name-ls diagnosis-curie-ls))
-(newline)
-(newline)
-(displayln
- (format "GENE VARIANT NAMES & CURIE-IDS FOR ~a:\n\nNAME(S): ~a \n\nCURIE(S): ~a" (car pmi-case-number-ls)
-         genetic_variant-name-ls genetic_variant-curie-ls))
-(newline)
-
+(define (find-exact-categories names)
+  (run* (cat) (fresh (db catid name)
+                (membero name names)
+                (== cat `(,db ,catid . ,name))
+                (categoryo cat))))
 
 #|ASSOCIATION-LIST KEYS FOR KNOWLEDGE GRAPH CONCEPTS|#
 
@@ -396,6 +313,44 @@
       (else
        (prune-xrefs (cdr ls) (cons (car ls) els))))))
 
+#|
+TODO: prune 2-hop concepts for indirect queries
+log:
+
+- if HGNC:#### exists, query #t and return HGNC symbol and HGNC:id, then 
+ string append gene and human, protein onto HGNC symbol. requery for 
+ umls ids. 
+
+- if string item exists, query #f for HGNC concepts, return only if 
+  string matches the hgnc symbol. 
+
+- 
+|#
+
+(define prune-xrefs/2-hop-concepts
+  (lambda (ls els)
+    (cond
+      ((null? ls) (flatten els))
+      ((or (void? (car ls))
+           (boolean? (car ls))
+           (string-contains? (car ls) "MTH:NOCODE"))
+       (prune-xrefs/2-hop-concepts (cdr ls) els))
+      ((or (string-contains? (car ls) "HGNC:")
+           (string-contains? (car ls) "NCBIGene:"))
+       (prune-xrefs/2-hop-concepts (cdr ls)
+                                   (cons (find-concepts #t (list (car ls))) els)))      
+      ((string-contains? (car ls) "HGNC:HGNC:")
+       (prune-xrefs/2-hop-concepts (cdr ls)
+                                   (cons (find-concepts #t (list (string-replace (car ls) "HGNC:HGNC:" "HGNC:")) els))))
+      ((string-contains? (car ls) "NCI_NCI-HGNC:HGNC:")
+       (prune-xrefs/2-hop-concepts (cdr ls)
+                                   (cons (find-concepts #t (list (string-replace (car ls) "NCI_NCI-HGNC:HGNC:" "HGNC:")) els))))
+      ((string-contains? (car ls) "NCBI:GENE")
+       (prune-xrefs/2-hop-concepts (cdr ls)
+                                   (cons (find-concepts #t (list (string-replace (car ls) "NCBIGene:")) els))))
+      (else
+       (prune-xrefs/2-hop-concepts (cdr ls) (cons (car ls) els))))))
+  
 (define get-concept-xrefs
   (lambda (query-ls els)
     (cond
@@ -536,7 +491,7 @@
       (else
        (query-hgnc-curie-for-hgnc-symbol
         (cdr ls) els)))))
-
+ 
 
 #|HELPER FUNCTIONS FOR TAB DELIMITED EXPORT FILE HEADERS & DATA|#
 
@@ -596,7 +551,8 @@
       (else
        (void)))))
 |#
- 
+
+#|
 (define start-function
   (time 
    (lambda (pmi-case-number-ls
@@ -613,75 +569,46 @@
          (cdr pmi-case-number-ls)
          (cdr genetic_variant-curie-ls) (cdr genetic_variant-name-ls)
          (cdr diagnosis-curie-ls) (cdr diagnosis-name-ls)))))))
+|#
+
+;;TODO, 1/20/2020 DEBUG START FUNCTION 
+
+(define remove-item
+  (lambda (x ls els)
+    (cond
+      ((null? ls) (reverse els))
+      ((equal? x (car ls))
+       (remove-item x (cdr ls) els))
+      (else
+       (remove-item x (cdr ls)
+                    (cons (car ls) els))))))
+
+(define start-function
+  (time 
+   (lambda (record-assoc-ls)
+     (cond
+       ((null? record-assoc-ls)
+        (void))
+       (else
+	(handle
+         (car record-assoc-ls))
+        (start-function
+         (cdr record-assoc-ls)))))))
 
 (define handle
   (time
-   (lambda (pmi-case-number-ls
-            genetic_variant-curie-ls genetic_variant-name-ls
-            diagnosis-curie-ls diagnosis-name-ls)
+   (lambda (record-assoc-ls)
      (cond 
-       ((null? genetic_variant-curie-ls) (void))
+       ((null? record-assoc-ls) (void))
        (else
 	(let* ((date (seconds->date (current-seconds)))
 	       (export-date 
 		(format "~a_~a_~a" 
 			(number->string (date-month date))
 			(number->string (date-day date))
-			(number->string(date-year date))))
-		(export-path
-                 (cdr (assoc "automated_query_export_path" (config))))
-	       (directory/path
-		(format "~a~a_~a_~a/" export-path export-date pmi-case-number-ls genetic_variant-name-ls))
-	       (make-export-directory
-		(if (directory-exists? directory/path)
-		    (error (format "ERROR IN EXPORT-DIRECTORY CREATION"))
-		    (make-directory directory/path)))
-	       (1-hop_molecular-entity-activators+inhibitors->target-gene/path
-		(format			
-		 "~a~a_1HOP_[molecular_entity_or_gene]_activators_and_inhibitors_of_~a.csv" directory/path pmi-case-number-ls genetic_variant-name-ls))
-	       (1-hop_direct-drug-activators+inhibitors->target-gene/path
-		(format			
-		 "~a~a_1HOP_[direct_drug]_activators_and_inhibitors_of_~a.csv" directory/path pmi-case-number-ls genetic_variant-name-ls))
-	       (2-hop_indirect-drug-activators+inhibitors->target-gene/path
-		(format			
-		 "~a~a_2HOP_[indirect_drug]_activators_and_inhibitors_of_~a.csv" directory/path pmi-case-number-ls genetic_variant-name-ls))
-	       (2-hop_combined-direct+indirect_drug-activators+inhibitors->target-gene/path
-		(format			
-		 "~a~a_2HOP_[combined_direct_and_indirect_drug]_activators_and_inhibitors_~a.csv" directory/path pmi-case-number-ls genetic_variant-name-ls))
-	       (1-hop_total-loss-of-function_target-gene-up/downregulates->molecular-entity/path
-		(format			
-		 "~a~a_1HOP_~a_upregulates_and_downregulates_[molecular_entity_or_gene].csv" directory/path pmi-case-number-ls genetic_variant-name-ls))
-	       (2-hop_total-loss-of-function_drugs->up/downregulate->genes-regulated-by-target-gene/path
-		(format			
-		 "~a~a_2HOP_[drug]_activators_and_inhibitors_of_genes_regulated_by_~a.csv"
-		 directory/path pmi-case-number-ls genetic_variant-name-ls))
-	       (1-hop_disease->assoc/inc_decreases->target-gene/path
-		(format			
-		 "~a~a_1HOP_[disease_or_phenotype]_associated_with_and_downregulates_~a.csv" directory/path pmi-case-number-ls genetic_variant-name-ls))
-	       (1-hop_target-gene_associated-with_and_decreases/prevents_disease-list/path
-		(format			
-		 "~a~a_1HOP_~a_associated_with_and_downregulates_[disease_or_phenotype].csv" directory/path pmi-case-number-ls genetic_variant-name-ls))
-               #|(1-hop_gene_associated-with_diagnosis-list/path
-		(format			
-		 "~a~a_1HOP_[molecular_entity_or_gene]_associated_with_patient_diagnsosis_list.csv" directory/path pmi-case-number-ls))|#
-	       (1-hop_direct-drug-activators+inhibitors->target-gene/port		
-		(open-output-file 1-hop_direct-drug-activators+inhibitors->target-gene/path #:exists 'can-update))
-	       (1-hop_molecular-entity-activators+inhibitors->target-gene/port
-		(open-output-file 1-hop_molecular-entity-activators+inhibitors->target-gene/path #:exists 'can-update))
-	       (2-hop_indirect-drug-activators+inhibitors->target-gene/port		
-		(open-output-file 2-hop_indirect-drug-activators+inhibitors->target-gene/path #:exists 'can-update))
-	       (2-hop_combined-direct+indirect_drug-activators+inhibitors->target-gene/port		
-		(open-output-file 2-hop_combined-direct+indirect_drug-activators+inhibitors->target-gene/path #:exists 'can-update))
-	       (1-hop_total-loss-of-function_target-gene-up/downregulates->molecular-entity/port
-		(open-output-file 1-hop_total-loss-of-function_target-gene-up/downregulates->molecular-entity/path #:exists 'can-update))
-	       (2-hop_total-loss-of-function_drugs->up/downregulate->genes-regulated-by-target-gene/port
-		(open-output-file 2-hop_total-loss-of-function_drugs->up/downregulate->genes-regulated-by-target-gene/path #:exists 'can-update))
-	       (1-hop_disease->assoc/inc_decreases->target-gene/port
-		(open-output-file 1-hop_disease->assoc/inc_decreases->target-gene/path #:exists 'can-update))
-	       (1-hop_target-gene_associated-with_and_decreases/prevents_disease-list/port
-		(open-output-file 1-hop_target-gene_associated-with_and_decreases/prevents_disease-list/path #:exists 'can-update))
-               #|(1-hop_gene_associated-with_diagnosis-list/port
-		(open-output-file 1-hop_gene_associated-with_diagnosis-list/path #:exists 'can-update))|#
+			(number->string (date-year date))))
+	       (export-path
+                (cdr (assoc "automated_query_export_path" (config))))
 	       (drugs
 		'((semmed 4 . "chemical_substance")
 		  (rtx 0 . "chemical_substance")
@@ -742,44 +669,227 @@
                (umls-protein-concept-suffix
                 " protein, human")
                (umls-gene-concept-suffix
-                " gene")
-               (hgnc-symbol-string
-                (query-hgnc-curie-for-hgnc-symbol
-                 (list genetic_variant-curie-ls) '()))
-               (hgnc-symbol-with-umls-suffix
-                (flatten
-                 (list
-                  (map (lambda (ls)
-                         (string-append ls umls-gene-concept-suffix))
-                       hgnc-symbol-string)
-                  (map (lambda (ls)
-                         (string-append ls umls-protein-concept-suffix))
-                       hgnc-symbol-string))))
-               (query-start/hgnc
-                (find-concepts #t (list genetic_variant-curie-ls)))
-               (raw-concepts/hgnc
-                (get-concept-xrefs query-start/hgnc '()))
-               (xrefs-from-hgnc
-                (remove-duplicates
-                 (prune-xrefs
-                  (flatten (get-concept-xrefs query-start/hgnc '())) '())))
-               (gene-concepts-ls/from-curies
-                (find-concepts #t xrefs-from-hgnc))
-               (gene-concepts-ls/from-hgnc-symbol-string
-                (find-concepts/options #f #f 0 #f hgnc-symbol-string))
-               (filtered-gene-concepts-from-fuzzy-string-search
-                (filter-umls-string-concepts
-                 gene-concepts-ls/from-hgnc-symbol-string
-                 hgnc-symbol-with-umls-suffix '()))
-               (gene-concept-ls
-                (append filtered-gene-concepts-from-fuzzy-string-search
-                        gene-concepts-ls/from-curies)))
+                " gene"))
+
+          (newline)
+          (displayln "HANDLE-BEGIN:")
+          (pretty-print record-assoc-ls)
           
-          	               
+          (define pmi-case-number-ls/from-assoc
+            (remove-item "_" (map (lambda (ls) (lookup-field ls "pmi_id")) record-assoc-ls) '()))
+                                  
+          (define symptom-name-ls
+            (remove-item "_" (map (lambda (ls) (lookup-field ls "symptom")) record-assoc-ls) '()))
+          
+          (define symptom-curie-ls
+            (remove-item "_" (map (lambda (ls) (lookup-field ls "symptom_id"))  record-assoc-ls) '()))
+
+          (define diagnosis-name-ls
+            (remove-item "_" (map (lambda (ls) (lookup-field ls "diagnosis")) record-assoc-ls) '()))
+          
+          (define diagnosis-curie-ls
+            (remove-item "_" (map (lambda (ls) (lookup-field ls "diagnosis_id")) record-assoc-ls) '()))
+          
+          (define medication-name-ls
+            (remove-item "_" (map (lambda (ls) (lookup-field ls "medication")) record-assoc-ls) '()))
+          
+          (define medication-curie-ls
+            (remove-item "_" (map (lambda (ls) (lookup-field ls "medication_id")) record-assoc-ls) '()))
+          
+          (define genetic_variant-name-ls/from-assoc
+            (remove-item "_" (map (lambda (ls) (lookup-field ls "genetic_variant")) record-assoc-ls) '()))
+          
+          (define genetic_variant-curie-ls/from-assoc
+            (remove-item "_" (map (lambda (ls) (lookup-field ls "genetic_variant_id")) record-assoc-ls) '()))
+
+          #|FOR PRINT/EXPORT STATEMENTS|#
+          (define pmi-case-number-ls
+            (car (remove-item "_" (map (lambda (ls) (lookup-field ls "pmi_id")) record-assoc-ls) '())))
+          
+          (define genetic_variant-name-ls
+            (car (remove-item "_" (map (lambda (ls) (lookup-field ls "genetic_variant")) record-assoc-ls) '())))
+
+          (define genetic_variant-curie-ls
+            (car (remove-item "_" (map (lambda (ls) (lookup-field ls "genetic_variant_id")) record-assoc-ls) '())))
+
+          #|CREATE EXPORT DIRECTORY|#
+          
+          (define directory/path
+            (format "~a~a_~a_~a/" export-path export-date pmi-case-number-ls genetic_variant-name-ls))
+          
+          (define make-export-directory
+            (if (directory-exists? directory/path)
+                (error (format "ERROR IN EXPORT-DIRECTORY CREATION"))
+                (make-directory directory/path)))
+           
+          (define 1-hop_molecular-entity-activators+inhibitors->target-gene/path
+            (format			
+             "~a~a_1HOP_[molecular_entity_or_gene]_activators_and_inhibitors_of_~a.csv"
+             directory/path pmi-case-number-ls genetic_variant-name-ls))
+          
+          (define 1-hop_direct-drug-activators+inhibitors->target-gene/path
+            (format			
+             "~a~a_1HOP_[direct_drug]_activators_and_inhibitors_of_~a.csv"
+             directory/path pmi-case-number-ls genetic_variant-name-ls))
+          
+          (define 2-hop_indirect-drug-activators+inhibitors->target-gene/path
+            (format			
+             "~a~a_2HOP_[indirect_drug]_activators_and_inhibitors_of_~a.csv"
+             directory/path pmi-case-number-ls genetic_variant-name-ls))
+          
+          (define 2-hop_combined-direct+indirect_drug-activators+inhibitors->target-gene/path
+            (format			
+             "~a~a_2HOP_[combined_direct_and_indirect_drug]_activators_and_inhibitors_~a.csv"
+             directory/path pmi-case-number-ls genetic_variant-name-ls))
+          
+          (define 1-hop_total-loss-of-function_target-gene-up/downregulates->molecular-entity/path
+            (format			
+             "~a~a_1HOP_~a_upregulates_and_downregulates_[molecular_entity_or_gene].csv"
+             directory/path pmi-case-number-ls genetic_variant-name-ls))
+          
+          (define 2-hop_total-loss-of-function_drugs->up/downregulate->genes-regulated-by-target-gene/path
+            (format			
+             "~a~a_2HOP_[drug]_activators_and_inhibitors_of_genes_regulated_by_~a.csv"
+             directory/path pmi-case-number-ls genetic_variant-name-ls))
+           
+          (define 1-hop_disease->assoc/inc_decreases->target-gene/path
+            (format			
+             "~a~a_1HOP_[disease_or_phenotype]_associated_with_and_downregulates_~a.csv"
+             directory/path pmi-case-number-ls genetic_variant-name-ls))
+          
+          (define 1-hop_target-gene_associated-with_and_decreases/prevents_disease-list/path
+            (format			
+             "~a~a_1HOP_~a_associated_with_and_downregulates_[disease_or_phenotype].csv"
+             directory/path pmi-case-number-ls genetic_variant-name-ls))
+
+          (define 1-hop_molecular-entity-activators+inhibitors->target-gene/port
+            (open-output-file 1-hop_molecular-entity-activators+inhibitors->target-gene/path #:exists 'can-update))
+
+          (define 2-hop_indirect-drug-activators+inhibitors->target-gene/port		
+            (open-output-file 2-hop_indirect-drug-activators+inhibitors->target-gene/path #:exists 'can-update))
+
+          (define 2-hop_combined-direct+indirect_drug-activators+inhibitors->target-gene/port		
+            (open-output-file 2-hop_combined-direct+indirect_drug-activators+inhibitors->target-gene/path #:exists 'can-update))
+          
+          (define 1-hop_total-loss-of-function_target-gene-up/downregulates->molecular-entity/port
+            (open-output-file 1-hop_total-loss-of-function_target-gene-up/downregulates->molecular-entity/path #:exists 'can-update))
+       
+          (define 2-hop_total-loss-of-function_drugs->up/downregulate->genes-regulated-by-target-gene/port
+            (open-output-file 2-hop_total-loss-of-function_drugs->up/downregulate->genes-regulated-by-target-gene/path #:exists 'can-update))          
+          (define 1-hop_disease->assoc/inc_decreases->target-gene/port
+            (open-output-file 1-hop_disease->assoc/inc_decreases->target-gene/path #:exists 'can-update))
+          
+          (define 1-hop_direct-drug-activators+inhibitors->target-gene/port		
+            (open-output-file 1-hop_direct-drug-activators+inhibitors->target-gene/path #:exists 'can-update))
+
+          (define 1-hop_target-gene_associated-with_and_decreases/prevents_disease-list/port
+            (open-output-file 1-hop_target-gene_associated-with_and_decreases/prevents_disease-list/path #:exists 'can-update))
+          
+
+
+          #|
+          (1-hop_gene_associated-with_diagnosis-list/port
+          (open-output-file 1-hop_gene_associated-with_diagnosis-list/path #:exists 'can-update))
+
+          (define 1-hop_gene_associated-with_diagnosis-list/path
+          (format			
+          "~a~a_1HOP_[molecular_entity_or_gene]_associated_with_patient_diagnsosis_list.csv" directory/path pmi-case-number-ls))          
+          |#
+
+          (define hgnc-symbol/id-pair
+            (lambda (ls1 ls2 els)
+              (cond
+                ((and (null? ls1)
+                      (null? ls2))
+                 els)
+                (else
+                 (hgnc-symbol/id-pair
+                  (cdr ls1) (cdr ls2)
+                  (cons
+                   (cons (car ls1)
+                         (car ls2)) els))))))
+          
+          (define hgnc-symbol/pair-from-input
+            (hgnc-symbol/id-pair
+             (list genetic_variant-name-ls)
+             (list genetic_variant-curie-ls) '()))
+
+          (define get-hgnc-symbol-string
+            (lambda (ls)
+            (query-hgnc-curie-for-hgnc-symbol
+             (list ls) '())))
+          
+          (define hgnc-symbol-string
+            (get-hgnc-symbol-string genetic_variant-curie-ls))
+
+          (define hgnc-symbol-with-umls-suffix
+            (flatten
+             (list
+              (map (lambda (ls)
+                     (string-append ls umls-gene-concept-suffix))
+                   hgnc-symbol-string)
+                   (map (lambda (ls)
+                          (string-append ls umls-protein-concept-suffix))
+                        hgnc-symbol-string))))
+
+          (define query-start/hgnc
+            (find-concepts #t (list genetic_variant-curie-ls)))
+
+          (define raw-concepts/hgnc
+            (get-concept-xrefs query-start/hgnc '()))
+
+          (define xrefs-from-hgnc
+                 (remove-duplicates
+                  (prune-xrefs
+                   (flatten (get-concept-xrefs query-start/hgnc '())) '())))
+
+          (define gene-concepts-ls/from-curies
+                 (find-concepts #t xrefs-from-hgnc))
+
+          (define gene-concepts-ls/from-hgnc-symbol-string
+                 (find-concepts/options #f #f 0 #f hgnc-symbol-string))
+
+          (define filtered-gene-concepts-from-fuzzy-string-search
+                 (filter-umls-string-concepts
+                  gene-concepts-ls/from-hgnc-symbol-string
+                  hgnc-symbol-with-umls-suffix '()))
+
+          (define gene-concept-ls
+            (append filtered-gene-concepts-from-fuzzy-string-search
+                    gene-concepts-ls/from-curies))
+          
+          (newline)
+          (displayln
+           (format "~a PREPARED FOR AUTOMATED 1 & 2-HOP QUERIES" pmi-case-number-ls))
+          (newline)
+
+          (newline)
+          (displayln
+           (format "SYMPTOM NAMES & CURIE-IDS FOR ~a:\n\nNAME(S): ~a \n\nCURIE(S): ~a" pmi-case-number-ls
+                   symptom-name-ls symptom-curie-ls))
+          (newline)
+
+          (newline)
+          (displayln
+           (format "MEDICATION NAMES & CURIE-IDS FOR ~a:\n\nNAME(S): ~a \n\nCURIE(S): ~a" pmi-case-number-ls
+                   medication-name-ls medication-curie-ls))
+          (newline)
+
+          (newline)
+          (displayln
+           (format "DIAGNOSIS NAMES & CURIE-IDS FOR ~a:\n\nNAME(S): ~a \n\nCURIE(S): ~a" pmi-case-number-ls
+                   diagnosis-name-ls diagnosis-curie-ls))
+          (newline)
+          
+          (newline)
+          (displayln
+           (format "GENE VARIANT NAMES & CURIE-IDS FOR ~a:\n\nNAME(S): ~a \n\nCURIE(S): ~a" pmi-case-number-ls
+                   genetic_variant-name-ls genetic_variant-curie-ls))
+          (newline)
+          
 	  (newline)
 	  (displayln (format "BEGINNING 1-HOP QUERY FOR ~a:\n[~a] --> INHIBITS/DECREASES EXPRESSION OF --> ~a" genetic_variant-name-ls filtered-X-molecular_entity genetic_variant-name-ls))
-	  (newline)
-	  
+          
 	  (match-define
 	   (list w-dec-gene=>concepts w-dec-gene=>edges)
 	   (time
@@ -821,6 +931,10 @@
             
 	  (define molecular_entity-inc-gene-list/edges (hash-ref z-inc-gene=>edges 'Z->inc))
 	  (define molecular_entity-inc-gene-list/concepts-from-query (hash-ref z-inc-gene=>concepts 'Z))
+
+          (displayln "CONCEPTS FROM P53 [GENE] --> PREDICATE --> P53")
+          (newline)
+          
 	  
 	  (newline)
 	  (displayln (format "~a [~a] --> ACTIVATES/INCREASES EXPRESSION OF --> ~a EDGES FOUND" (length molecular_entity-inc-gene-list/edges) filtered-X-molecular_entity genetic_variant-name-ls))
@@ -838,7 +952,8 @@
 	       molecular_entity-inc-gene-list/edges '()))))
 		 
 	  (define mol_entity-up+down-regulators-for-target-gene/export-edges
-	    (append (remove-duplicates mol_entity-dec-o/export-edges) (remove-duplicates mol_entity-inc-o/export-edges)))
+	    (append (remove-duplicates mol_entity-dec-o/export-edges)
+                    (remove-duplicates mol_entity-inc-o/export-edges)))
 	  
 	  (export-column-headers
 	   COLUMN_HEADERS_1-HOP_GENE_REGULATORS
@@ -847,18 +962,130 @@
 	  
 	  (outer-loop mol_entity-up+down-regulators-for-target-gene/export-edges
 		      1-hop_molecular-entity-activators+inhibitors->target-gene/port)
-	  
-	  (define molecular-entity-inhibitors/for-intersection
+
+          
+          #|GATHER CONCEPTS FROM [GENE/MOLECULAR ENTITY] --> INCREASES & DECREASES --> TARGET-GENE FOR PRUNING|#
+
+          ;;TODO: and a harsher prune function here to eliminate "the bomb" concepts for 2-hop query
+
+          ;;drug --> increases --> molecular-entity ---> increases ---> curie-id
+
+          
+          #|
+
+          (define 2-hop/prune
+            (lambda (ls els)
+              (cond
+                ((null? ls) (remove-duplicates els))
+                ((string-contains? (car ls) "HGNC:")
+                 (2-hop/prune (cdr ls) (cons (car ls) els)))
+                (else
+                 (2-hop/prune (cdr ls) els)))))
+          
+          (define molecular-entity-inhibitors/for-intersection
+            (2-hop/prune
+             (map (lambda (ls) (string-replace ls "NCI_NCI-HGNC:HGNC:" "HGNC:")) 
+                  (flatten
+                   (get-concept-xrefs
+                    (remove-duplicates molecular_entity-dec-gene-list/concepts-from-query) '()))) '()))
+          
+          #|
+          cpu time: 378 real time: 378 gc time: 9
+          map: all lists must have same size    ; ; ; ; ;
+          first list length: 13254          
+          other list length: 0
+          procedure: #<procedure:.../z_batch_hal.rkt:999:23> ; ;
+          [,bt for context]
+          |#
+
+          (define molecular-entity-activators/for-intersection
+            (2-hop/prune
+             (map (lambda (ls) (string-replace ls "HGNC:HGNC:" "HGNC:"))
+                  (map (lambda (ls) (string-replace ls "NCI_NCI-HGNC:HGNC:" "HGNC:")) 
+                       (flatten
+                        (get-concept-xrefs
+                         (remove-duplicates molecular_entity-inc-gene-list/concepts-from-query) '())) '())) '()))
+          
+          (define molecular-entity-inhibitors/hgnc-string-ids
+            (get-hgnc-symbol-string
+             molecular-entity-inhibitors/for-intersection))
+
+          (define get-hgnc-symbol-with-umls-suffix
+            (lambda (ls1)
+              (flatten
+               (list
+                (map (lambda (ls)
+                       (string-append ls umls-gene-concept-suffix))
+                     ls1)
+                (map (lambda (ls)
+                       (string-append ls umls-protein-concept-suffix))
+                     ls1)))))
+
+          (define molecular-entity-inhibitors/hgnc-string-ids/umls-suffix
+            (get-hgnc-symbol-with-umls-suffix molecular-entity-inhibitors/hgnc-string-ids))
+
+          (displayln "molecular-entity-inhibitors/hgnc-string-ids/umls-suffix")
+          (newline)
+          (pretty-print molecular-entity-inhibitors/hgnc-string-ids/umls-suffix)
+          
+          
+          (define query-start/molecular-entity-inhibitors-from-hgnc
+            (find-concepts #t molecular-entity-activators/for-intersection))
+
+          (newline)
+          (displayln "query-start/molecular-entity-inhibitors-from-hgnc")
+          (pretty-print query-start/molecular-entity-inhibitors-from-hgnc)
+
+          (define raw-concepts/molecular-entity-inhibitors-from-hgnc
+            (get-concept-xrefs query-start/molecular-entity-inhibitors-from-hgnc '()))
+
+          (newline)
+          (displayln "raw-concepts/molecular-entity-inhibitors-from-hgnc")
+          (pretty-print raw-concepts/molecular-entity-inhibitors-from-hgnc)
+
+          (define molecular-entity-inhibitors/xrefs-from-hgnc
+            (remove-duplicates
+             (prune-xrefs
+              (flatten (get-concept-xrefs query-start/molecular-entity-inhibitors-from-hgnc '())) '())))
+
+          (newline)
+          (displayln "molecular-entity-inhibitors/xrefs-from-hgnc")
+          (pretty-print molecular-entity-inhibitors/xrefs-from-hgnc)
+
+          (define gene-concepts-ls/molecular-entity-inhibitors/from-curies
+            (find-concepts #t molecular-entity-inhibitors/xrefs-from-hgnc))
+
+          (define gene-concepts-ls/molecular-entity-inhibitors/from-hgnc-symbol-string
+            (find-concepts/options #f #f 0 #f molecular-entity-inhibitors/hgnc-string-ids))
+          
+          (define filtered-gene-concepts-from-fuzzy-string-search/molecular-entity-inhibitors
+            (filter-umls-string-concepts
+             molecular-entity-inhibitors/hgnc-string-ids
+             molecular-entity-inhibitors/hgnc-string-ids/umls-suffix '()))
+         
+
+          (define gene-concept-ls/molecular-entity-inhibitors
+            (append filtered-gene-concepts-from-fuzzy-string-search/molecular-entity-inhibitors
+                    gene-concepts-ls/molecular-entity-inhibitors/from-curies))
+          |#
+          
+          
+          ;;(pretty-print molecular-entity-activators/for-intersection)
+          
+          ;;TODO: see above!
+
+          (define molecular-entity-inhibitors/for-intersection
 	    (prune-xrefs
 	     (flatten
 	      (get-concept-xrefs
 	       (remove-duplicates molecular_entity-dec-gene-list/concepts-from-query) '())) '()))
 
-	  (define molecular-entity-activators/for-intersection
+          (define molecular-entity-activators/for-intersection
 	    (prune-xrefs
 	     (flatten
 	      (get-concept-xrefs
 	       (remove-duplicates molecular_entity-inc-gene-list/concepts-from-query) '())) '()))
+
 
 	  (define molecular-entity-inhibitors/concepts
 	    (find-concepts
@@ -869,7 +1096,7 @@
 	    (find-concepts
 	     #t
 	     molecular-entity-activators/for-intersection))
-
+          
 	  (newline)
 	  (displayln
 	   (format "BEGINNING INDIRECT DRUG ACTIVATOR QUERY FOR ~a:\n[[~a]] --> INHIBITS/DECREASES EXPRESSION OF --> [~a] --> INHIBITS/DECREASES EXPRESSION OF ~a" genetic_variant-name-ls filtered-X-drug filtered-X-molecular_entity genetic_variant-name-ls))
@@ -1517,6 +1744,9 @@
           molecular-entity-associated-with-disease-list/edges '()))))
           
 |#          
+
+
+|#
           (newline)
           (displayln (format "CASE COMPLETE:~a" pmi-case-number-ls))
           (newline)
@@ -1524,11 +1754,7 @@
 	  ))))))
 
 (start-function
-pmi-case-number-ls
-genetic_variant-curie-ls genetic_variant-name-ls
-diagnosis-curie-ls diagnosis-name-ls)
-
-
+ record-assoc-ls)
 
 
 #|
@@ -1540,7 +1766,7 @@ diagnosis-curie-ls diagnosis-name-ls)
       (else
        (inner-loop (car ls) port)
        (fprintf port (format "~c" #\newline))
-       (outer-loop (cdr ls) port)))))
+-loop (cdr ls) port)))))
 
 (define inner-loop/csv
   (lambda (ls port)
@@ -1565,6 +1791,90 @@ diagnosis-curie-ls diagnosis-name-ls)
   (open-output-file input-file/path
 |#
 
+
+
+
+#|
+(define build-concepts/inner-loop
+  (lambda (ls)
+    (list
+     (cons
+      (list-ref pmi-patient-record-headers 0)
+      (list-ref ls 0))
+     (cons
+      (list-ref pmi-patient-record-headers 1)
+      (list-ref ls 1))
+     (cons
+      (list-ref pmi-patient-record-headers 2)
+      (list-ref ls 2))
+     (cons
+      (list-ref pmi-patient-record-headers 3)
+      (list-ref ls 3))
+     (cons
+      (list-ref pmi-patient-record-headers 4)
+      (list-ref ls 4))
+     (cons
+      (list-ref pmi-patient-record-headers 5)
+      (list-ref ls 5))
+     (cons
+      (list-ref pmi-patient-record-headers 6)
+      (list-ref ls 6))
+     (cons
+      (list-ref pmi-patient-record-headers 7)
+      (list-ref ls 7))
+     (cons
+      (list-ref pmi-patient-record-headers 8)
+      (list-ref ls 8)))))
+
+(define build-concepts
+  (lambda (ls els)
+    (cond
+      ((null? ls) (reverse els))
+      (else 
+       (build-concepts
+        (cdr ls)
+        (cons (build-concepts/inner-loop (car ls)) els))))))
+
+
+(define build-curie
+  (lambda (ls assoc-key)    
+    (remove-item
+     "_"
+     (map cdr (map (lambda (ls) (assoc assoc-key ls)) ls)) '())))
+ 
+#|CONVERTS ROWS OF INPUT FILE INTO ASSOCIATION LIST FOR EACH PAITENT RECORD|#
+
+(define pmi-patient-concept-association-ls
+  (build-concepts
+   pmi-records
+   '()))
+
+(define record-id-ls
+  (map (lambda (ls)
+         (assoc "pmi_id" ls)) pmi-patient-concept-association-ls))
+
+(define pmi-case-number-ls
+  (build-curie pmi-patient-concept-association-ls "pmi_id"))
+(define symptom-name-ls
+  (build-curie pmi-patient-concept-association-ls "symptom"))
+(define symptom-curie-ls
+  (build-curie pmi-patient-concept-association-ls "symptom_id"))
+(define diagnosis-name-ls
+  (build-curie pmi-patient-concept-association-ls "diagnosis"))
+(define diagnosis-curie-ls
+  (build-curie pmi-patient-concept-association-ls "diagnosis_id"))
+(define medication-name-ls
+  (build-curie pmi-patient-concept-association-ls "medication"))
+(define medication-curie-ls
+  (build-curie pmi-patient-concept-association-ls "medication_id"))
+(define genetic_variant-name-ls
+  (build-curie pmi-patient-concept-association-ls "genetic_variant"))
+(define genetic_variant-curie-ls
+  (build-curie pmi-patient-concept-association-ls "genetic_variant_id"))
+
+
+
+|#
 
 #|
 read-tsv 
@@ -1676,3 +1986,4 @@ read-tsv
       ((next) (set! current (next-record)) current)
       (else (error "invalid csv-records request:" request)))))
 |#
+
