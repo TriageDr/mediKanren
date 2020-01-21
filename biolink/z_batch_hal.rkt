@@ -4,7 +4,7 @@
 (require "common.rkt" "mk-db.rkt")
 (require racket/date)
 (require csv-reading)
-(require csv-writing)
+;;(require csv-writing)
 (require "csv.rkt"
          "repr.rkt")
 (require racket/list racket/port racket/set racket/stream racket/string)
@@ -14,10 +14,10 @@
 #|CSV INPUT-FILE WITH SPECIFIC HEADERS REQUIRED FOR AUTOMATED MK-QUERIES|#
 
 (define input/path
-  "/home/mjpatton/PhD/CaseReviews/test_prototype_files/pmi_case_record_template_test1.csv")
+  "/Users/ozborn/Box Sync/UAB_Projects/AlzheimerDrugReposition/medikanren/templates/pmi_case_record_template_test_alz15.csv")
 
 (define input-file
-  (open-input-file "/home/mjpatton/PhD/CaseReviews/test_prototype_files/pmi_case_record_template_test1.csv"))
+  (open-input-file input/path))
 
 (define header-expected
   "pmi_id,symptom,symptom_id,medication,medication_id,diagnosis,diagnosis_id,genetic_variant,genetic_variant_id")

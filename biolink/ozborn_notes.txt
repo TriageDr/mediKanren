@@ -1,0 +1,11 @@
+# Edit your template file for your set of genes
+
+#Edit z_batch_hal.rkt
+
+ (define input/path
+-  "/home/mjpatton/PhD/CaseReviews/test_prototype_files/pmi_case_record_template_test1.csv")
++  "/Users/ozborn/Box Sync/UAB_Projects/AlzheimerDrugReposition/medikanren/templates/pmi_case_record_template_test_alz15.csv")
+ 
+ (define input-file
+-  (open-input-file "/home/mjpatton/PhD/CaseReviews/test_prototype_files/pmi_case_record_template_test1.csv"))
++  (open-input-file input/path)
