@@ -1086,7 +1086,6 @@ log:
 	      (get-concept-xrefs
 	       (remove-duplicates molecular_entity-inc-gene-list/concepts-from-query) '())) '()))
 
-
 	  (define molecular-entity-inhibitors/concepts
 	    (find-concepts
 	     #t
@@ -1744,9 +1743,6 @@ log:
           molecular-entity-associated-with-disease-list/edges '()))))
           
 |#          
-
-
-|#
           (newline)
           (displayln (format "CASE COMPLETE:~a" pmi-case-number-ls))
           (newline)
