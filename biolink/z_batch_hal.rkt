@@ -14,12 +14,18 @@
 #|CSV INPUT-FILE WITH SPECIFIC HEADERS REQUIRED FOR AUTOMATED MK-QUERIES|#
 #|
 (define input/path
-  "/home/mjpatton/PhD/CaseReviews/test_prototype_files/01_23_2020_template.csv")
+  "/home/mjpatton/PhD/CaseReviews/test_prototype_files/corona_virus_template.csv")
 
+(define input-file
+  (open-input-file "/home/mjpatton/PhD/CaseReviews/test_prototype_files/corona_virus_template.csv"))
+|#
+
+(define input/path
+  "/home/mjpatton/PhD/CaseReviews/test_prototype_files/01_23_2020_template.csv")
 (define input-file
   (open-input-file "/home/mjpatton/PhD/CaseReviews/test_prototype_files/01_23_2020_template.csv"))
 
-
+#|
 (define input/path
   "/home/mjpatton/PhD/CaseReviews/test_prototype_files/automated_mk_query_pmi_registry_cont.csv")
 
@@ -29,7 +35,6 @@
 
 (define header-expected
   "record_id,phenotype_or_symptom,phenotype_or_symptom_id,drug_or_medication,drug_or_medication_id,diagnosis_or_disease,diagnosis_or_disease_id,genetic_variant_symbol,genetic_variant_id")
-
 
 (define automated-query-template-record-headers
   '("record_id"
@@ -47,7 +52,7 @@
   (lambda (expected-header input)
     (let ((header-found (read-line input 'any)))
       (when (not (equal? header-found header-expected))
-          (error (format "INPUT-FILE HEADER ERROR!\nHEADER FOUND:~a\nHEADER-EXPECTED: ~a" header-found header-expected))))))
+        (error (format "INPUT-FILE HEADER ERROR!\nHEADER FOUND:~a\nHEADER-EXPECTED: ~a" header-found header-expected))))))
 
 (define pmi-records
   (time (call-with-input-file
@@ -93,8 +98,6 @@
                   (list current-id (list row) (cons (reverse current-bucket) previous-buckets)))))
              (list (lookup-field (car rows) field-to-group-by) '() '()) rows))
     (reverse (cons (cadr final-state) (caddr final-state)))))
-
-
 
 (define record-assoc-ls
   (group-by pmi-assoc-ls "record_id"))
@@ -240,43 +243,6 @@
      "increases_transport_of"
      "increases_uptake_of"))
 
-(define decreases
-  (find-predicates
-   '("negatively_regulates"
-     "negatively_regulates__entity_to_entity"
-     "decreases_molecular_interaction"
-     "decreases_secretion_of"
-     "decreases_synthesis_of"
-     "decreases_transport_of"
-     "decreases_uptake_of"
-     "prevents"
-     "treats"
-     "disrupts"
-     "increases_degradation_of"
-     "decreases_activity_of"
-     "decreases_expression_of")))
-
-(define increases
-  (find-predicates
-   '("positively_regulates"
-     "positively_regulates__entity_to_entity"
-     "produces"
-     "causes"
-     "causes_condition"
-     "causally_related_to"
-     "contributes_to"
-     "gene_associated_with_condition"
-     "gene_mutations_contribute_to"
-     "decreases_degradation_of"
-     "increases_activity_of"
-     "increases_expression_of"
-     "increases_molecular_interaction"
-     "increases_response_to"
-     "increases_secretion_of"
-     "increases_stability_of"
-     "increases_synthesis_of"
-     "increases_transport_of"
-     "increases_uptake_of")))
 
 (define atom?
   (lambda (x)
@@ -359,7 +325,7 @@
                     (cons 
                      (string-replace (car ls) "NCBIGENE:" "NCBIGene:") els)))
       (else
-       (prune-xrefs (cdr ls) (cons (car ls) els))))))
+       (prune-xrefs (cdr ls) (cons (car ls) els)))))) 
 
 (define get-concept-xrefs
   (lambda (query-ls els)
@@ -396,6 +362,7 @@
       (else
        (set-union (get-rxnorm (car ls) els)
                   (get-rxnorm (cdr ls) els))))))
+
 #|
 (define append-fda
   (lambda (ls els)
@@ -575,7 +542,7 @@
 (define 2-hop/prune
   (lambda (ls els)
     (cond
-      ((null? ls) els)
+      ((null? ls) (remove-duplicates els))
       ((regexp-match #rx"^HGNC:[0-9]+" (car ls))
        (2-hop/prune (cdr ls)
                     (cons (car ls) els)))
@@ -599,6 +566,36 @@
                     (cons (car ls) els)))
       (else
        (2-hop/prune (cdr ls) els)))))
+
+;;TODO: add in clause to search for protein, human and gene appended
+;;      to a symbol, then take that symbol a requery it for concept
+;;      confirm the concept is a hgnc-id with the extracter
+
+(define xrefs-ls->hgnc-id
+  (lambda (ls els)
+    (cond
+      ((null? ls) (remove-duplicates els))
+      ((regexp-match #rx"^HGNC:[0-9]+" (car ls))
+       (xrefs-ls->hgnc-id (cdr ls)
+                    (cons (car ls) els)))
+      ((regexp-match #rx"^NCI_NCI-HGNC:HGNC:[0-9]+" (car ls))
+       (xrefs-ls->hgnc-id (cdr ls)
+                    (cons
+                     (string-replace (car ls) "NCI_NCI-HGNC:HGNC:" "HGNC:")
+                     els)))
+      ((regexp-match #rx"^HGNC:HGNC:[0-9]+" (car ls))
+       (xrefs-ls->hgnc-id (cdr ls)
+                    (cons
+                     (string-replace (car ls) "HGNC:HGNC:" "HGNC:")
+                     els)))
+      ((regexp-match #rx"^ gene" (car ls))
+       (xrefs-ls->hgnc-id (cdr ls)
+                    (cons
+                     (string-replace (car ls) "HGNC:HGNC:" "HGNC:")
+                     els)))
+      
+      (else
+       (xrefs-ls->hgnc-id (cdr ls) els)))))
 
 #|HELPER FUNCTIONS FOR TAB DELIMITED EXPORT FILE HEADERS & DATA|#
 (define export-column-headers
@@ -656,7 +653,6 @@
       (else
        (void)))))
 |#
-
 
 (define remove-item
   (lambda (x ls els)
@@ -826,15 +822,20 @@
                " protein, human")
                (umls-gene-concept-suffix
                 " gene"))
-
           
           #|CREATE EXPORT DIRECTORY|#
           (define directory/path
             (format "~a~a_~a_~a/" export-path export-date pmi-case-number-ls genetic_variant-name-ls))          
 
+          ;;read in existing file, delete it and re-export
+          ;;do
+          ;;
           (define make-export-directory
             (if (directory-exists? directory/path)
-                (error (format "DUPLICATE PATIENT-RECORD & QUERY-ELEMENT NAME, CHECK TEMPLATE FILE FOR DUPLICATES!"))
+                (call-with-output-file directory/path
+                  (lambda (out)
+                    out)
+                  #:mode 'replace)
                 (make-directory directory/path)))
            
           (define 1-hop_molecular-entity-activators+inhibitors->target-gene/path
@@ -917,6 +918,83 @@
           
           (displayln "GENETIC-VARIANT-SYMBOL")
           (pretty-print genetic_variant-curie-ls)
+
+          (define decreases
+            (find-predicates
+             '("negatively_regulates"
+               "negatively_regulates__entity_to_entity"
+               "decreases_molecular_interaction"
+               "decreases_secretion_of"
+               "decreases_synthesis_of"
+               "decreases_transport_of"
+               "decreases_uptake_of"
+               "prevents"
+               "treats"
+               "disrupts"
+               "increases_degradation_of"
+               "decreases_activity_of"
+               "decreases_expression_of")))
+
+          (define increases
+            (find-predicates
+             '("positively_regulates"
+               "positively_regulates__entity_to_entity"
+               "produces"
+               "causes"
+               "causes_condition"
+               "causally_related_to"
+               "contributes_to"
+               "gene_associated_with_condition"
+               "gene_mutations_contribute_to"
+               "decreases_degradation_of"
+               "increases_activity_of"
+               "increases_expression_of"
+               "increases_molecular_interaction"
+               "increases_response_to"
+               "increases_secretion_of"
+               "increases_stability_of"
+               "increases_synthesis_of"
+               "increases_transport_of"
+               "increases_uptake_of")))
+
+
+          #|
+          #|testing new extract func|#
+          (define extract-hgnc-gene-concepts-from-concept-or-edge
+            (lambda (query-ls els)
+              (cond
+                ((null? query-ls) (set-union els))
+                (else
+                 (let ((concept-xrefs (get-concept-xrefs (car query-ls) '())))
+                   (match (car query-ls)
+                     [`(,db ,cui ,id ,name ,category ,properties-list)
+                      (cond
+                        ((or (regexp-match #rx"^HGNC:[0-9]+" id)
+                             (regexp-match #rx"^HGNC:[0-9]+" concept-xrefs))
+                         (extract-hgnc-gene-concepts-from-concept-or-edge
+                          (cdr query-ls)
+                          (set-union
+                           (list id name) els)))
+                        (else
+                         (extract-hgnc-gene-concepts-from-concept-or-edge
+                          (cdr query-ls)
+                          els)))]
+                     [`(,db ,edge-cui
+                            (,subject-cui ,subject-id ,subject-name (,_ . ,subject-category) ,subject-props-assoc)
+                            (,concept-cui ,concept-id ,concept-name (,_ . ,concept-category) ,concept-props-assoc)
+                            (,_ . ,pred)
+                            ,pred-props-assoc)
+                      (cond
+                        ((regexp-match #rx"^HGNC:[0-9]+" subject-id)
+                         (extract-hgnc-gene-concepts-from-concept-or-edge
+                          (cdr query-ls)
+                          (set-union
+                           (list subject-id subject-name) els)))
+                        (else
+                         (extract-hgnc-gene-concepts-from-concept-or-edge
+                          (cdr query-ls)
+                          els)))]))))))
+|#
           
           (define hgnc-symbol/id-pair
             (lambda (ls1 ls2 els)
@@ -970,12 +1048,11 @@
           (define hgnc-symbol-with-umls-suffix
             (get-hgnc-symbol-with-umls-suffix
              hgnc-symbol-string '()))
-          #|
+          
           (newline)
           (displayln "hgnc-symbol-with-umls-suffix")
           (pretty-print hgnc-symbol-with-umls-suffix)
-          |#
-
+          
           
           (define get-molecular-entity-concepts-from-hgnc
             (lambda (ls els)
@@ -989,11 +1066,10 @@
           (define query-start/hgnc
             (get-molecular-entity-concepts-from-hgnc
              (list genetic_variant-curie-ls) '()))
-          #|
+          
           (displayln "query-start/hgnc")
           (newline)
           (pretty-print query-start/hgnc)
-          |#
 
           (define raw-concepts/hgnc
             (get-concept-xrefs query-start/hgnc '()))
@@ -1001,12 +1077,11 @@
           (define xrefs-from-hgnc
             (remove-duplicates
              (prune-xrefs
-              (flatten (get-concept-xrefs query-start/hgnc '())) '())))
-          #|
+              (get-concept-xrefs query-start/hgnc '()) '())))
+          
           (newline)
           (displayln "xrefs-from-hgnc")
           (pretty-print xrefs-from-hgnc)
-          |#
           
           (define get-gene-concepts-ls/from-curies
             (lambda (ls els)
@@ -1046,9 +1121,24 @@
             (append filtered-gene-concepts-from-fuzzy-string-search
                     gene-concepts-ls/from-curies))
 
+          (define extract-name/curie-from-concept
+            (lambda (query-ls els)
+              (cond
+                ((null? query-ls) els)
+                (else 
+                 (match (car query-ls)
+                   [`(,db ,cui ,id ,name ,category ,properties-list)
+                    (extract-name/curie-from-concept
+                     (cdr query-ls)
+                     (cons
+                      (list db name id) els))])))))
+          
           (displayln "HGNC-ID DERIVED CONCEPTS:")
-          (pretty-print gene-concept-ls)
-           
+          (newline)
+          (pretty-print (extract-name/curie-from-concept gene-concept-ls '()))
+
+          (newline)
+          (newline)
           (newline)
           (displayln
            (format "~a PREPARED FOR AUTOMATED 1 & 2-HOP QUERIES" pmi-case-number-ls))
@@ -1155,73 +1245,86 @@
 	  (outer-loop mol_entity-up+down-regulators-for-target-gene/export-edges
 		      1-hop_molecular-entity-activators+inhibitors->target-gene/port)
           
-          #|GATHER CONCEPTS FROM [GENE/MOLECULAR ENTITY] --> INCREASES & DECREASES --> TARGET-GENE FOR PRUNING|#
-                   
-          #|
-          (displayln "molecular_entity-dec-gene-list/concepts-from-query")
-          (pretty-print molecular_entity-dec-gene-list/concepts-from-query)
-          (newline)
-          (displayln "molecular_entity-inc-gene-list/concepts-from-query")
-          (pretty-print molecular_entity-inc-gene-list/concepts-from-query)
-          (newline)
-          |#
-
+          #|GATHER CONCEPTS FROM [GENE/MOLECULAR ENTITY] --> INCREASES & DECREASES --> TARGET-GENE FOR PRUNING|#                   
+          
           (define xrefs-from/molecular_entity-dec-gene-list/concepts-from-query
-            (get-concept-xrefs molecular_entity-dec-gene-list/concepts-from-query '()))
-
+            (xrefs-ls->hgnc-id
+             (get-concept-xrefs
+              molecular_entity-dec-gene-list/concepts-from-query '()) '()))
+          
           (define xrefs-from/molecular_entity-inc-gene-list/concepts-from-query
-            (get-concept-xrefs molecular_entity-inc-gene-list/concepts-from-query '()))
+            (xrefs-ls->hgnc-id
+             (get-concept-xrefs
+              molecular_entity-inc-gene-list/concepts-from-query '()) '()))
 
-          (define molecular-entity-inhibitors/hgnc-curie-ls  
-            (2-hop/prune xrefs-from/molecular_entity-dec-gene-list/concepts-from-query '()))
-
-          (define molecular-entity-activators/hgnc-curie-ls 
-            (2-hop/prune xrefs-from/molecular_entity-inc-gene-list/concepts-from-query '()))
-
+          #|
+          (displayln  "xrefs-from/molecular_entity-dec-gene-list/concepts-from-query")
+          (pretty-print xrefs-from/molecular_entity-dec-gene-list/concepts-from-query)
+          (displayln  "xrefs-from/molecular_entity-inc-gene-list/concepts-from-query")
+          (pretty-print xrefs-from/molecular_entity-inc-gene-list/concepts-from-query)
+          |#
+          
+          #|          
           (newline)
 	  (displayln (format "GATHERING EXTERNAL-REFERENCES/ALIASES FROM [~a] UP/DOWN-REGULATORS OF ~a FOR 2-HOP QUERIES" filtered-X-molecular_entity genetic_variant-name-ls))
           (newline)
-          #|
-          (define molecular-entity-inhibitors/hgnc-curie-ls
-            (get-molecular-entities-for-2hop/hgnc-curie-ls
-             molecular_entity-dec-gene-list/concepts-from-query))
-          (define 
-            (get-molecular-entities-for-2hop/hgnc-curie-ls
-             molecular_entity-inc-gene-list/concepts-from-query))
-          |#
-
-          (define query-start/molecular-entity-inhibitors-from-hgnc
-            (get-molecular-entity-concepts-from-hgnc
-             molecular-entity-inhibitors/hgnc-curie-ls
-             '()))
-          (define query-start/molecular-entity-activators-from-hgnc
-            (get-molecular-entity-concepts-from-hgnc
-             molecular-entity-activators/hgnc-curie-ls '()))
-
-          #|
-          (define query-start/molecular-entity-inhibitors-from-hgnc
-            (find-concepts #t 
-             molecular-entity-inhibitors/hgnc-curie-ls)
-          (define query-start/molecular-entity-activators-from-hgnc
-          (find-concepts #t
-             molecular-entity-activators/hgnc-curie-ls))
-
           |#
           
+          (define query-start/molecular-entity-inhibitors-from-hgnc
+            (get-molecular-entity-concepts-from-hgnc
+             xrefs-from/molecular_entity-dec-gene-list/concepts-from-query
+             '()))          
+          (define query-start/molecular-entity-activators-from-hgnc
+            (get-molecular-entity-concepts-from-hgnc
+             xrefs-from/molecular_entity-inc-gene-list/concepts-from-query
+             '()))
+                    
+          (displayln (format "~a HGNC-ID GENE-CONCEPTS FOUND FOR [~a] INHIBITORS OF ~a" (length query-start/molecular-entity-inhibitors-from-hgnc) filtered-X-molecular_entity genetic_variant-name-ls))
+          (newline)
+          
+          (displayln (format "~a HGNC-ID GENE-CONCEPTS FOUND FOR [~a] ACTIVATORS OF ~a" (length query-start/molecular-entity-activators-from-hgnc) filtered-X-molecular_entity genetic_variant-name-ls))
+          (newline)
+
           #|
+          (newline)
           (displayln "query-start/molecular-entity-inhibitors-from-hgnc")
           (pretty-print query-start/molecular-entity-inhibitors-from-hgnc)
-          (newline)
+          
           (displayln "query-start/molecular-entity-activators-from-hgnc")
           (pretty-print query-start/molecular-entity-activators-from-hgnc)
           |#
           
+          #|
           (displayln (format "~a CONCEPTS FOUND FOR [~a] INHIBITORS OF ~a" (length query-start/molecular-entity-inhibitors-from-hgnc) filtered-X-molecular_entity genetic_variant-name-ls))
-          (newline)
-          
+          (newline)          
           (displayln (format "~a CONCEPTS FOUND FOR [~a] ACTIVATORS OF ~a" (length query-start/molecular-entity-activators-from-hgnc) filtered-X-molecular_entity genetic_variant-name-ls))
           (newline)                                         
+          |#
+
+          (define xrefs-from-2hop-hgnc/activators
+            (remove-duplicates
+             (prune-xrefs
+              (get-concept-xrefs query-start/molecular-entity-inhibitors-from-hgnc '()) '())))
+          (define xrefs-from-2hop-hgnc/inhibitors
+            (remove-duplicates
+             (prune-xrefs
+              (get-concept-xrefs query-start/molecular-entity-activators-from-hgnc '()) '())))
+
+          (define gene-concepts-ls/molecular-entity-inhibitors/from-curies
+            (remove-duplicates
+             (get-gene-concepts-ls/from-curies
+              xrefs-from-2hop-hgnc/activators '())))          
+          (define gene-concepts-ls/molecular-entity-activators/from-curies
+            (remove-duplicates
+             (get-gene-concepts-ls/from-curies
+              xrefs-from-2hop-hgnc/inhibitors '())))
           
+          (displayln (format "~a HGNC-ID DERIVED CONCEPTS FOUND FOR [~a] INHIBITORS OF ~a" (length gene-concepts-ls/molecular-entity-inhibitors/from-curies) filtered-X-molecular_entity genetic_variant-name-ls))
+          (newline)
+          
+          (displayln (format "~a HGNC-ID DERIVED CONCEPTS FOUND FOR [~a] ACTIVATORS OF ~a" (length gene-concepts-ls/molecular-entity-activators/from-curies) filtered-X-molecular_entity genetic_variant-name-ls))
+          (newline)
+                    
           ;;; filter out concepts that down have hgnc-id
           (define extract-hgnc-gene-concepts-from-concept-or-edge
             (lambda (query-ls els)
@@ -1254,20 +1357,20 @@
                       (else
                        (extract-hgnc-gene-concepts-from-concept-or-edge
                         (cdr query-ls)
-                        els)))])))))
-          
-           
+                        els)))])))))         
+                     
           (define xrefs-from-query-start/molecular-entity-inhibitors-from-hgnc
             (remove-duplicates
              (flatten
               (extract-hgnc-gene-concepts-from-concept-or-edge
-               query-start/molecular-entity-inhibitors-from-hgnc '()))))
+               gene-concepts-ls/molecular-entity-inhibitors/from-curies '()))))
+          
           (define xrefs-from-query-start/molecular-entity-activators-from-hgnc
             (remove-duplicates
              (flatten
               (extract-hgnc-gene-concepts-from-concept-or-edge
-               query-start/molecular-entity-activators-from-hgnc '()))))
-
+               gene-concepts-ls/molecular-entity-activators/from-curies '()))))
+          
           #|
           (displayln "xrefs-from-query-start/molecular-entity-inhibitors-from-hgnc")
           (pretty-print xrefs-from-query-start/molecular-entity-inhibitors-from-hgnc)
@@ -1275,26 +1378,8 @@
           (displayln "xrefs-from-query-start/molecular-entity-activators-from-hgnc")
           (pretty-print xrefs-from-query-start/molecular-entity-activators-from-hgnc)
           (newline)
-          |#
+          |#                             
           
-          (define get-gene-concepts-ls/molecular-entity/from-curies
-            (lambda (ls els)
-              (cond
-                ((null? ls) els)
-                (else
-                 (get-gene-concepts-ls/molecular-entity/from-curies
-                  (cdr ls)
-                  (set-union
-                   (find-concepts #t (list (car ls))) els))))))
-                   
-          (define gene-concepts-ls/molecular-entity-inhibitors/from-curies
-            (get-gene-concepts-ls/molecular-entity/from-curies
-             xrefs-from-query-start/molecular-entity-inhibitors-from-hgnc '()))
-          
-          (define gene-concepts-ls/molecular-entity-activators/from-curies
-            (get-gene-concepts-ls/molecular-entity/from-curies
-             xrefs-from-query-start/molecular-entity-activators-from-hgnc '()))
-
           #|
           (displayln "gene-concepts-ls/molecular-entity-inhibitors/from-curies")
           (pretty-print gene-concepts-ls/molecular-entity-inhibitors/from-curies)
@@ -1303,24 +1388,13 @@
           (pretty-print gene-concepts-ls/molecular-entity-activators/from-curies)
           |#
 
-          (newline)
-          (displayln (format "FILTERING CONCEPTS BY HGNC-ID TO REMOVE NON-SPECIFIC ~a CONCEPTS PRIOR TO 2-HOP QUERY" filtered-X-molecular_entity))
-          (newline)
-          
-          (displayln (format "~a HGNC-ID DERIVED CONCEPTS FOUND FOR [~a] INHIBITORS OF ~a" (length gene-concepts-ls/molecular-entity-inhibitors/from-curies) filtered-X-molecular_entity genetic_variant-name-ls))
-          (newline)
-          
-          (displayln (format "~a HGNC-ID DERIVED CONCEPTS FOUND FOR [~a] ACTIVATORS OF ~a" (length gene-concepts-ls/molecular-entity-activators/from-curies) filtered-X-molecular_entity genetic_variant-name-ls))
-          (newline)
 
-          (newline)
-          (newline)
           (newline)
           (displayln (format "GATHERING ALIASES/EXTERNAL-REFERENCES FROM HGNC-ID DERIVED CONCEPTS FOR [~a]" filtered-X-molecular_entity))
           (newline)
 
           (define molecular-entity-inhibitors/hgnc-string-ids
-            (query-hgnc-curie-for-hgnc-symbol
+            (query-hgnc-curie-for-hgnc-symbol 
              xrefs-from-query-start/molecular-entity-inhibitors-from-hgnc '()))
           (define molecular-entity-activators/hgnc-string-ids
             (query-hgnc-curie-for-hgnc-symbol
@@ -1334,39 +1408,30 @@
           (pretty-print molecular-entity-activators/hgnc-string-ids)
           (newline)
           |#
-          
+
           (define molecular-entity-inhibitors/hgnc-string-ids/umls-suffix
             (get-hgnc-symbol-with-umls-suffix
              molecular-entity-inhibitors/hgnc-string-ids '()))
           (define molecular-entity-activators/hgnc-string-ids/umls-suffix
             (get-hgnc-symbol-with-umls-suffix
              molecular-entity-activators/hgnc-string-ids '()))
-
           #|
           (displayln "molecular-entity-inhibitors/hgnc-string-ids/umls-suffix")
           (pretty-print molecular-entity-inhibitors/hgnc-string-ids/umls-suffix)
           (newline)
           (displayln "molecular-entity-activators/hgnc-string-ids/umls-suffix")
-          (pretty-print molecular-entity-activators/hgnc-string-ids/umls-suffix)
+          (pretty-print molecular-entity-activators/hgnc-string-ids/umls-suffix)          
           |#
           
-          (define get-gene-concepts-ls/molecular-entity-inhibitors-or-activators/from-hgnc-symbol-string
-            (lambda (ls els)
-              (cond
-                ((null? ls) els)
-                (else
-                 (get-gene-concepts-ls/molecular-entity-inhibitors-or-activators/from-hgnc-symbol-string
-                  (cdr ls)
-                  (set-union (find-concepts/options #f #f 0 #f (list (car ls))) els))))))
-          
           (define gene-concepts-ls/molecular-entity-inhibitors/from-hgnc-symbol-string
-            (get-gene-concepts-ls/molecular-entity-inhibitors-or-activators/from-hgnc-symbol-string
+            (get-gene-concepts-ls/from-hgnc-symbol-string 
              molecular-entity-inhibitors/hgnc-string-ids '()))
           
           (define gene-concepts-ls/molecular-entity-activators/from-hgnc-symbol-string
-            (get-gene-concepts-ls/molecular-entity-inhibitors-or-activators/from-hgnc-symbol-string
+            (get-gene-concepts-ls/from-hgnc-symbol-string 
              molecular-entity-activators/hgnc-string-ids '()))
 
+          
           #|
           (displayln "gene-concepts-ls/molecular-entity-inhibitors/from-hgnc-symbol-string")
           (pretty-print gene-concepts-ls/molecular-entity-inhibitors/from-hgnc-symbol-string)
@@ -1399,17 +1464,12 @@
           (newline)
           |#
           
-          (define extract-name/curie-from-concept
-            (lambda (query-ls els)
-              (cond
-                ((null? query-ls) els)
-                (else 
-                 (match (car query-ls)
-                   [`(,db ,cui ,id ,name ,category ,properties-list)
-                    (extract-name/curie-from-concept
-                     (cdr query-ls)
-                     (cons
-                      (list db name id) els))])))))
+
+          #|
+          (newline)
+          (displayln filtered-gene-concepts-from-fuzzy-string-search/molecular-entity-inhibitors)
+          (pretty-print filtered-gene-concepts-from-fuzzy-string-search/molecular-entity-inhibitors)
+          |#
           
           (define molecular-entity-inhibitors/concepts
             (append filtered-gene-concepts-from-fuzzy-string-search/molecular-entity-inhibitors
@@ -1418,57 +1478,34 @@
             (append filtered-gene-concepts-from-fuzzy-string-search/molecular-entity-activators
                     gene-concepts-ls/molecular-entity-activators/from-curies))
 
+          
           (define molecular-entity-inhibitors/concepts-for-print
-            (extract-name/curie-from-concept molecular-entity-inhibitors/concepts '()))
-
+            (extract-name/curie-from-concept molecular-entity-inhibitors/concepts '()))          
           (define molecular-entity-activators/concepts-for-print
             (extract-name/curie-from-concept molecular-entity-activators/concepts '()))
- 
-                    
+          
+          (newline)          
           (displayln (format "~a CONCEPTS FOUND FOR STRING+CURIE IDENTIFIERS OF [~a] INHIBITORS OF ~a" (length molecular-entity-inhibitors/concepts) filtered-X-molecular_entity genetic_variant-name-ls))
           (newline)
           (displayln (format "CONCEPT NAMES & CURIES FOR STRING+CURIE IDENTIFIERS OF [~a] INHIBITORS OF ~a" filtered-X-molecular_entity genetic_variant-name-ls))
           (newline)
+          (newline)
           (displayln (format "~a" molecular-entity-inhibitors/concepts-for-print))
+          (newline)
+          (newline)
           (newline)
           
           (displayln (format "~a CONCEPTS FOUND FOR STRING+CURIE IDENTIFIERS [~a] ACTIVATORS OF ~a" (length molecular-entity-activators/concepts) filtered-X-molecular_entity genetic_variant-name-ls))
           (newline)          
           (displayln (format "CONCEPT NAMES & CURIES FOR STRING+CURIE IDENTIFIERS OF [~a] ACTIVATORS OF ~a" filtered-X-molecular_entity genetic_variant-name-ls))
           (newline)
+          (newline)
           (displayln (format "~a" molecular-entity-activators/concepts-for-print))
           (newline)
-         
+          (newline)
+          (newline)
+                             
 
-          #|
-          (newline)
-          (displayln (format "PREPARING ~a CONCEPTS FOR 2-HOP QUERY:\nSTRING APPENDING UMLS-SPECIFIC SUFFIXES: ~a ~a TO HGNC SPECIFIC GENE SYMBOLS" filtered-X-molecular_entity umls-protein-concept-suffix umls-gene-concept-suffix))
-          (newline)
-          
-          (define molecular-entity-inhibitors/for-intersection
-	    (remove-duplicates
-             (prune-xrefs
-              (flatten
-               (get-concept-xrefs
-                (remove-duplicates molecular-entity-inhibitors/concepts-from-str/curie) '())) '())))
-          (define molecular-entity-activators/for-intersection
-	    (remove-duplicates
-             (prune-xrefs
-              (flatten
-               (get-concept-xrefs
-                (remove-duplicates molecular-entity-activators/concepts-from-str/curie) '())) '())))
-          |#
-          
-          #|
-          (displayln "molecular-entity-inhibitors/for-intersection")
-          (pretty-print molecular-entity-inhibitors/for-intersection)
-          (newline)
-          (displayln "molecular-entity-activators/for-intersection")
-          (pretty-print molecular-entity-activators/for-intersection)
-          (newline)
-          |#
-                    
-	  (newline)
 	  (displayln
 	   (format "BEGINNING INDIRECT DRUG ACTIVATOR QUERY FOR ~a:\n[[~a]] --> INHIBITS/DECREASES EXPRESSION OF --> [~a] --> INHIBITS/DECREASES EXPRESSION OF ~a" genetic_variant-name-ls filtered-X-drug filtered-X-molecular_entity genetic_variant-name-ls))
 	  (newline)
@@ -1664,7 +1701,7 @@
 	      (match-drug-pred-gene-edges
 	       drug-dec-gene-list/edges '() pmi-case-number-ls))))
 
-          (pretty-print drug-dec-o/export-edges)
+          ;;(pretty-print drug-dec-o/export-edges)
           
 
 	  (newline)
@@ -1931,23 +1968,21 @@
 	  (outer-loop
 	   total_LOF_target-gene->increases/decreases->molecular-entity/export-edges
 	   1-hop_total-loss-of-function_target-gene-up/downregulates->molecular-entity/port)
-
+          
           #|CLEANING LIST FOR GENE OR GENE-PRODUCTS|#
 
-
+          ;;TODO: if the edge has a wt allele or NOS3 protein, human, there are no HGNC refs in that
+          ;;concept or its xrefs, thus the hgnc-id scraper xrefs-ls->hgnc-id will not work
+          ;; use (find-concepts #f (list "NOS3")) to prove this point. 
           (define xrefs_total_LOF_gene-decreases-molecular_entity-list/concepts-from-query
-            (get-concept-xrefs total_LOF_gene-decreases-molecular_entity-list/concepts-from-query '()))
+            (xrefs-ls->hgnc-id
+             (get-concept-xrefs
+              total_LOF_gene-decreases-molecular_entity-list/concepts-from-query '()) '()))
 
           (define xrefs_total_LOF_gene-increases-molecular_entity-list/concepts-from-query
-            (get-concept-xrefs total_LOF_gene-increases-molecular_entity-list/concepts-from-query '()))
-
-          (define gene->dec->molecular-entity/hgnc-curie-ls
-            (2-hop/prune
-             xrefs_total_LOF_gene-decreases-molecular_entity-list/concepts-from-query '()))
-          
-          (define gene->inc->molecular-entity/hgnc-curie-ls
-            (2-hop/prune
-             xrefs_total_LOF_gene-increases-molecular_entity-list/concepts-from-query '()))
+            (xrefs-ls->hgnc-id
+             (get-concept-xrefs
+              total_LOF_gene-increases-molecular_entity-list/concepts-from-query '()) '()))
           
           (newline)
 	  (displayln (format "GATHERING EXTERNAL-REFERENCES/ALIASES FROM [~a] THAT ARE UP & DOWN REGULATED BY ~a" filtered-X-molecular_entity genetic_variant-name-ls))
@@ -1955,11 +1990,32 @@
           
           (define query-start/gene->dec->molecular-entity/hgnc-curie-ls
             (get-molecular-entity-concepts-from-hgnc
-             gene->dec->molecular-entity/hgnc-curie-ls '()))
+             xrefs_total_LOF_gene-decreases-molecular_entity-list/concepts-from-query
+              '()))
           (define query-start/gene->inc->molecular-entity/hgnc-curie-ls
             (get-molecular-entity-concepts-from-hgnc
-             gene->inc->molecular-entity/hgnc-curie-ls '())) 
-                               
+             xrefs_total_LOF_gene-increases-molecular_entity-list/concepts-from-query
+             '()))
+
+          (define xrefs-from-1hop-hgnc/target-gene->dec->mol-entity
+            (remove-duplicates
+             (prune-xrefs
+              (get-concept-xrefs
+               query-start/gene->dec->molecular-entity/hgnc-curie-ls '()) '())))
+          (define xrefs-from-1hop-hgnc/target-gene->inc->mol-entity
+            (remove-duplicates
+             (prune-xrefs
+              (get-concept-xrefs
+               query-start/gene->inc->molecular-entity/hgnc-curie-ls '()) '())))
+
+          (define gene-concepts-ls/gene->dec->molecular-entity/from-curies
+            (remove-duplicates
+             (get-gene-concepts-ls/from-curies
+              xrefs-from-1hop-hgnc/target-gene->dec->mol-entity '())))
+          (define gene-concepts-ls/gene->inc->molecular-entity/from-curies
+            (get-gene-concepts-ls/from-curies
+             xrefs-from-1hop-hgnc/target-gene->inc->mol-entity '()))
+
           (define xrefs-from-query-start/gene->dec->molecular-entity
             (remove-duplicates
              (flatten
@@ -1970,13 +2026,6 @@
              (flatten
               (extract-hgnc-gene-concepts-from-concept-or-edge
                query-start/gene->inc->molecular-entity/hgnc-curie-ls '()))))
-                             
-          (define gene-concepts-ls/gene->dec->molecular-entity/from-curies
-            (get-gene-concepts-ls/molecular-entity/from-curies
-             xrefs-from-query-start/gene->dec->molecular-entity '()))          
-          (define gene-concepts-ls/gene->inc->molecular-entity/from-curies
-            (get-gene-concepts-ls/molecular-entity/from-curies
-             xrefs-from-query-start/gene->inc->molecular-entity '()))
            
           (define gene->dec->molecular-entity/hgnc-string-ids
             (query-hgnc-curie-for-hgnc-symbol
@@ -1993,10 +2042,10 @@
              gene->inc->molecular-entity/hgnc-string-ids '()))
                     
           (define gene-concepts-ls/gene->dec->molecular-entity/from-hgnc-symbol-string
-            (get-gene-concepts-ls/molecular-entity-inhibitors-or-activators/from-hgnc-symbol-string
+            (get-gene-concepts-ls/from-hgnc-symbol-string 
              gene->dec->molecular-entity/hgnc-string-ids '()))          
           (define gene-concepts-ls/gene->inc->molecular-entity/from-hgnc-symbol-string
-            (get-gene-concepts-ls/molecular-entity-inhibitors-or-activators/from-hgnc-symbol-string
+            (get-gene-concepts-ls/from-hgnc-symbol-string 
             gene->inc->molecular-entity/hgnc-string-ids '()))
           
           (define filtered-gene-concepts-from-fuzzy-string-search/gene->dec->molecular-entity
@@ -2020,33 +2069,33 @@
 
           (define gene->dec->molecular-entity/concepts-for-print
             (extract-name/curie-from-concept gene->dec->molecular-entity/concepts '()))
-
           (define gene->inc->molecular-entity/concepts-for-print
             (extract-name/curie-from-concept gene->inc->molecular-entity/concepts '()))
 
-          (newline)
-          (newline)
-          (newline)
-          (newline)
-          (newline)
-          (newline)
-                    
+          (newline)                    
           (displayln (format "~a CONCEPTS FOUND FOR STRING+CURIE IDENTIFIERS OF [~a] DOWN-REGULATED OR INHIBITED BY ~a" (length gene->dec->molecular-entity/concepts) filtered-X-molecular_entity genetic_variant-name-ls))
           (newline)
           (displayln (format "CONCEPT NAMES & CURIES FOR STRING+CURIE IDENTIFIERS OF [~a] DOWN-REGULATED OR INHIBITED BY ~a" filtered-X-molecular_entity genetic_variant-name-ls))
           (newline)
+          (newline)
+          (newline)
           (displayln (format "~a" gene->dec->molecular-entity/concepts-for-print))
+          (newline)
+          (newline)
           (newline)
           
           (displayln (format "~a CONCEPTS FOUND FOR STRING+CURIE IDENTIFIERS [~a] UP-REGULATED OR ACTIVATED BY ~a" (length gene->inc->molecular-entity/concepts) filtered-X-molecular_entity genetic_variant-name-ls))
           (newline)          
           (displayln (format "CONCEPT NAMES & CURIES FOR STRING+CURIE IDENTIFIERS OF [~a] UP-REGULATED OR ACTIVATED BY ~a" filtered-X-molecular_entity genetic_variant-name-ls))
           (newline)
+          (newline)
+          (newline)
           (displayln (format "~a" gene->inc->molecular-entity/concepts-for-print))
           (newline)
+          (newline)
+          (newline)
+          
          
-
-
           #|ENDING TOTAL LOF GENE CLEANING |#
 
 	  #|--BEGINNING 2-HOP DRUG->INC/DEC-->GENES AFFECTED BY TOTAL-LOF OF TARGET-GENE|#
@@ -2437,4 +2486,556 @@ read-tsv
 		   "(\"named_thing\" \"genetic_condition\" \"disease\" \"phenotypic_feature\")")
 		  (robokop 14 . "(\"named_thing\" \"disease\" \"phenotypic_feature\")")))|#
 |#
+#|
+(define corona_virus/curies
+  (2-hop/prune corona_virus/xrefs '()))
 
+(define corona_virus/xrefs
+  '("Susceptibility to coronavirus 229e"
+    "HP:0005396"
+    "UMLS:C1852539"
+    "MESH:C501689"
+    "E protein, SARS coronavirus"
+    "UMLS:C1570531"
+    "MESH:C479931"
+    "3C-like protease, SARS coronavirus"
+    "UMLS:C1433062"
+    "LNC:LP39470-7"
+    "LNC:MTHU011212"
+    "Porcine respiratory coronavirus Ag"
+    "UMLS:C0883321"
+    "LNC:LP37510-2"
+    "LNC:MTHU011428"
+    "Canine coronavirus Ab"
+    "UMLS:C0882751"
+    "MESH:C118611"
+    "glycoprotein 3b, coronavirus"
+    "UMLS:C0766211"
+    "MESH:C099602"
+    "nucleocapsid protein, Coronavirus"
+    "UMLS:C0389916"
+    "SNMI:C-E0250"
+    "SNOMEDCT_US:72390003"
+    "SNOMEDCT_VET:347031000009102"
+    "SNOMEDCT_US:449238002"
+    "Canine coronavirus vaccine"
+    "UMLS:C0310701"
+    "MESH:C087632"
+    "glycoprotein 6b, coronavirus"
+    "UMLS:C0255554"
+    "RCD:AyuDC"
+    "MDR:10051905"
+    "CHV:0000021065"
+    "LCH_NW:sh90004313"
+    "RCDSY:AyuDC"
+    "ICD10CM:B34.2"
+    "RCD:A795."
+    "MDR:10053983"
+    "MEDCIN:318393"
+    "NDFRT:N0000003799"
+    "ICD10AM:B34.2"
+    "MTH:NOCODE"
+    "ICPC2ICD10ENG:MTHU038700"
+    "SNOMEDCT_US:186747009"
+    "MESH:D018352"
+    "ICD10:B34.2"
+    "SNOMEDCT_US:187467005"
+    "Coronavirus Infections"
+    "UMLS:C0206750"
+    "UMLS:C0174990"
+    "coronavirus receptor"
+    "MESH:C078034"
+    "UMLS:C0246449"
+    "M protein, Coronavirus"
+    "MESH:C067997"
+    "UMLS:C0255558"
+    "nonstructural protein, coronavirus"
+    "MESH:C087633"
+    "UMLS:C0369034"
+    "Coronavirus antibody"
+    "LNC:MTHU022123"
+    "SNOMEDCT_US:120814005"
+    "LNC:LP37778-5"
+    "UMLS:C0528529"
+    "3C-like proteinase, Coronavirus"
+    "MESH:C099456"
+    "UMLS:C0805362"
+    "Bovine coronavirus Ag"
+    "SNOMEDCT_US:709225000"
+    "LNC:MTHU009322"
+    "LNC:LP37387-5"
+    "UMLS:C0883053"
+    "Feline coronavirus Ab"
+    "LNC:MTHU011458"
+    "LNC:LP38135-7"
+    "UMLS:C0883460"
+    "Canine coronavirus Ag"
+    "LNC:LP37511-0"
+    "SNOMEDCT_US:709320007"
+    "LNC:MTHU011430"
+    "UMLS:C1452735"
+    "3a protein, severe acute respiratory syndrome coronavirus"
+    "MESH:C487105"
+    "DOID:2946"
+    "obsolete coronavirus infectious disease"
+    "MONDO:0007386"
+    "Human Coronavirus Sensitivity"
+    "OMIM:122460"
+    "Coronavirus 229E Susceptibility"
+    "HUMAN CORONAVIRUS SENSITIVITY; HCVS"
+    "HCVS"
+    "HUMAN CORONAVIRUS sensitivity; HCVS"
+    "HUMAN CORONAVIRUS sensitivity"
+    "Coronavirus 229E susceptibility"))
+
+(define corona_virus/concepts
+  (remove-duplicates '((semmed
+     97349
+     "UMLS:C0174990"
+     "coronavirus receptor"
+     (0 . "biological_entity")
+     (("umls_type_label" . "(\"Amino Acid, Peptide, or Protein\" \"Receptor\")")
+      ("xrefs" . "(\"MESH:C078034\")")
+      ("id" . "UMLS:C0174990")
+      ("umls_type" . "(\"T116\" \"T192\")")))
+    (semmed
+     10750
+     "UMLS:C0206750"
+     "Coronavirus Infections"
+     (7 . "disease_or_phenotypic_feature")
+     (("umls_type_label" . "(\"Disease or Syndrome\")")
+      ("xrefs"
+       .
+       "(\"RCD:AyuDC\" \"MDR:10051905\" \"CHV:0000021065\" \"LCH_NW:sh90004313\" \"RCDSY:AyuDC\" \"ICD10CM:B34.2\" \"RCD:A795.\" \"MDR:10053983\" \"MEDCIN:318393\" \"NDFRT:N0000003799\" \"ICD10AM:B34.2\" \"MTH:NOCODE\" \"ICPC2ICD10ENG:MTHU038700\" \"SNOMEDCT_US:186747009\" \"MESH:D018352\" \"ICD10:B34.2\" \"SNOMEDCT_US:187467005\")")
+      ("id" . "UMLS:C0206750")
+      ("umls_type" . "(\"T047\")")))
+    (semmed
+     80484
+     "UMLS:C0246449"
+     "M protein, Coronavirus"
+     (6 . "protein")
+     (("umls_type_label" . "(\"Amino Acid, Peptide, or Protein\")")
+      ("xrefs" . "(\"MESH:C067997\")")
+      ("id" . "UMLS:C0246449")
+      ("umls_type" . "(\"T116\")")))
+    (semmed
+     163024
+     "UMLS:C0255554"
+     "glycoprotein 6b, coronavirus"
+     (6 . "protein")
+     (("umls_type_label" . "(\"Amino Acid, Peptide, or Protein\")")
+      ("xrefs" . "(\"MESH:C087632\")")
+      ("id" . "UMLS:C0255554")
+      ("umls_type" . "(\"T116\")")))
+    (semmed
+     120934
+     "UMLS:C0255558"
+     "nonstructural protein, coronavirus"
+     (6 . "protein")
+     (("umls_type_label" . "(\"Amino Acid, Peptide, or Protein\")")
+      ("xrefs" . "(\"MESH:C087633\")")
+      ("id" . "UMLS:C0255558")
+      ("umls_type" . "(\"T116\")")))
+    (semmed
+     99947
+     "UMLS:C0310701"
+     "Canine coronavirus vaccine"
+     (0 . "biological_entity")
+     (("umls_type_label"
+       .
+       "(\"Pharmacologic Substance\" \"Amino Acid, Peptide, or Protein\" \"Immunologic Factor\")")
+      ("xrefs"
+       .
+       "(\"SNMI:C-E0250\" \"SNOMEDCT_US:72390003\" \"SNOMEDCT_VET:347031000009102\" \"SNOMEDCT_US:449238002\")")
+      ("id" . "UMLS:C0310701")
+      ("umls_type" . "(\"T121\" \"T116\" \"T129\")")))
+    (semmed
+     99446
+     "UMLS:C0369034"
+     "Coronavirus antibody"
+     (0 . "biological_entity")
+     (("umls_type_label"
+       .
+       "(\"Amino Acid, Peptide, or Protein\" \"Immunologic Factor\")")
+      ("xrefs"
+       .
+       "(\"LNC:MTHU022123\" \"SNOMEDCT_US:120814005\" \"LNC:LP37778-5\")")
+      ("id" . "UMLS:C0369034")
+      ("umls_type" . "(\"T116\" \"T129\")")))
+    (semmed
+     94819
+     "UMLS:C0389916"
+     "nucleocapsid protein, Coronavirus"
+     (6 . "protein")
+     (("umls_type_label"
+       .
+       "(\"Nucleic Acid, Nucleoside, or Nucleotide\" \"Amino Acid, Peptide, or Protein\")")
+      ("xrefs" . "(\"MESH:C099602\")")
+      ("id" . "UMLS:C0389916")
+      ("umls_type" . "(\"T114\" \"T116\")")))
+    (semmed
+     56157
+     "UMLS:C0528529"
+     "3C-like proteinase, Coronavirus"
+     (6 . "protein")
+     (("umls_type_label" . "(\"Amino Acid, Peptide, or Protein\" \"Enzyme\")")
+      ("xrefs" . "(\"MESH:C099456\")")
+      ("id" . "UMLS:C0528529")
+      ("umls_type" . "(\"T116\" \"T126\")")))
+    (semmed
+     149288
+     "UMLS:C0766211"
+     "glycoprotein 3b, coronavirus"
+     (6 . "protein")
+     (("umls_type_label" . "(\"Amino Acid, Peptide, or Protein\")")
+      ("xrefs" . "(\"MESH:C118611\")")
+      ("id" . "UMLS:C0766211")
+      ("umls_type" . "(\"T116\")")))
+    (semmed
+     122154
+     "UMLS:C0805362"
+     "Bovine coronavirus Ag"
+     (4 . "chemical_substance")
+     (("umls_type_label" . "(\"Immunologic Factor\")")
+      ("xrefs"
+       .
+       "(\"SNOMEDCT_US:709225000\" \"LNC:MTHU009322\" \"LNC:LP37387-5\")")
+      ("id" . "UMLS:C0805362")
+      ("umls_type" . "(\"T129\")")))
+    (semmed
+     77060
+     "UMLS:C0882751"
+     "Canine coronavirus Ab"
+     (0 . "biological_entity")
+     (("umls_type_label"
+       .
+       "(\"Amino Acid, Peptide, or Protein\" \"Immunologic Factor\")")
+      ("xrefs" . "(\"LNC:LP37510-2\" \"LNC:MTHU011428\")")
+      ("id" . "UMLS:C0882751")
+      ("umls_type" . "(\"T116\" \"T129\")")))
+    (semmed
+     156401
+     "UMLS:C0883053"
+     "Feline coronavirus Ab"
+     (0 . "biological_entity")
+     (("umls_type_label"
+       .
+       "(\"Amino Acid, Peptide, or Protein\" \"Immunologic Factor\")")
+      ("xrefs" . "(\"LNC:MTHU011458\" \"LNC:LP38135-7\")")
+      ("id" . "UMLS:C0883053")
+      ("umls_type" . "(\"T116\" \"T129\")")))
+    (semmed
+     136745
+     "UMLS:C0883321"
+     "Porcine respiratory coronavirus Ag"
+     (0 . "biological_entity")
+     (("umls_type_label"
+       .
+       "(\"Amino Acid, Peptide, or Protein\" \"Immunologic Factor\")")
+      ("xrefs" . "(\"LNC:LP39470-7\" \"LNC:MTHU011212\")")
+      ("id" . "UMLS:C0883321")
+      ("umls_type" . "(\"T116\" \"T129\")")))
+    (semmed
+     160691
+     "UMLS:C0883460"
+     "Canine coronavirus Ag"
+     (0 . "biological_entity")
+     (("umls_type_label"
+       .
+       "(\"Amino Acid, Peptide, or Protein\" \"Immunologic Factor\")")
+      ("xrefs"
+       .
+       "(\"LNC:LP37511-0\" \"SNOMEDCT_US:709320007\" \"LNC:MTHU011430\")")
+      ("id" . "UMLS:C0883460")
+      ("umls_type" . "(\"T116\" \"T129\")")))
+    (semmed
+     89842
+     "UMLS:C1433062"
+     "3C-like protease, SARS coronavirus"
+     (6 . "protein")
+     (("umls_type_label" . "(\"Amino Acid, Peptide, or Protein\" \"Enzyme\")")
+      ("xrefs" . "(\"MESH:C479931\")")
+      ("id" . "UMLS:C1433062")
+      ("umls_type" . "(\"T116\" \"T126\")")))
+    (semmed
+     118805
+     "UMLS:C1452735"
+     "3a protein, severe acute respiratory syndrome coronavirus"
+     (0 . "biological_entity")
+     (("umls_type_label"
+       .
+       "(\"Biologically Active Substance\" \"Amino Acid, Peptide, or Protein\")")
+      ("xrefs" . "(\"MESH:C487105\")")
+      ("id" . "UMLS:C1452735")
+      ("umls_type" . "(\"T116\" \"T123\")")))
+    (semmed
+     75229
+     "UMLS:C1570531"
+     "E protein, SARS coronavirus"
+     (0 . "biological_entity")
+     (("umls_type_label"
+       .
+       "(\"Biologically Active Substance\" \"Amino Acid, Peptide, or Protein\")")
+      ("xrefs" . "(\"MESH:C501689\")")
+      ("id" . "UMLS:C1570531")
+      ("umls_type" . "(\"T116\" \"T123\")")))
+    (rtx
+     56498
+     "HP:0005396"
+     "Susceptibility to coronavirus 229e"
+     (8 . "phenotypic_feature")
+     (("expanded" . "True")
+      ("rtx_name" . "HP:0005396")
+      ("description"
+       .
+       "Increased susceptibility to coronavirus 229e, as manifested by recurrent episodes of coronavirus 229e.")
+      ("id" . "HP:0005396")
+      ("accession" . "0005396")
+      ("UUID" . "2692d8bc-3a37-11e9-8caf-0242ac110004")
+      ("uri" . "http://purl.obolibrary.org/obo/HP_0005396")
+      ("seed_node_uuid" . "39368ad0-390c-11e9-8caf-0242ac110004")))
+    (robokop
+     73524
+     "HP:0005396"
+     "Susceptibility to coronavirus 229e"
+     (6 . "(\"named_thing\" \"phenotypic_feature\")")
+     (("id" . "HP:0005396")
+      ("equivalent_identifiers" . "(\"HP:0005396\" \"UMLS:C1852539\")")))
+    (orange
+     500689
+     "DOID:2946"
+     "obsolete coronavirus infectious disease"
+     (2 . "(\"named thing\")")
+     (("iri" . "http://purl.obolibrary.org/obo/DOID_2946")
+      ("provided_by" . "(\"hpoa.ttl\")")
+      ("id" . "DOID:2946")))
+    (orange
+     4644
+     "HP:0005396"
+     "Susceptibility to coronavirus 229e"
+     (0 . "(\"phenotypic feature\")")
+     (("iri" . "http://purl.obolibrary.org/obo/HP_0005396")
+      ("provided_by" . "(\"hpoa.ttl\")")
+      ("description"
+       .
+       "Increased susceptibility to coronavirus 229e, as manifested by recurrent episodes of coronavirus 229e.")
+      ("id" . "HP:0005396")))
+    (orange
+     41555
+     "MONDO:0007386"
+     "Human Coronavirus Sensitivity"
+     (5 . "(\"disease\")")
+     (("iri" . "http://purl.obolibrary.org/obo/MONDO_0007386")
+      ("synonym"
+       .
+       "(\"Coronavirus 229E Susceptibility\" \"HUMAN CORONAVIRUS SENSITIVITY; HCVS\" \"HCVS\" \"HUMAN CORONAVIRUS sensitivity; HCVS\" \"HUMAN CORONAVIRUS sensitivity\" \"Coronavirus 229E susceptibility\")")
+      ("provided_by" . "(\"hpoa.ttl\" \"mondo.owl\")")
+      ("same_as" . "(\"OMIM:122460\")")
+      ("id" . "MONDO:0007386")))
+  (semmed
+   97349
+   "UMLS:C0174990"
+   "coronavirus receptor"
+   (0 . "biological_entity")
+   (("umls_type_label" . "(\"Amino Acid, Peptide, or Protein\" \"Receptor\")")
+    ("xrefs" . "(\"MESH:C078034\")")
+    ("id" . "UMLS:C0174990")
+    ("umls_type" . "(\"T116\" \"T192\")")))
+
+  (semmed
+   10750
+   "UMLS:C0206750"
+   "Coronavirus Infections"
+   (7 . "disease_or_phenotypic_feature")
+   (("umls_type_label" . "(\"Disease or Syndrome\")")
+    ("xrefs"
+     .
+     "(\"RCD:AyuDC\" \"MDR:10051905\" \"CHV:0000021065\" \"LCH_NW:sh90004313\" \"RCDSY:AyuDC\" \"ICD10CM:B34.2\" \"RCD:A795.\" \"MDR:10053983\" \"MEDCIN:318393\" \"NDFRT:N0000003799\" \"ICD10AM:B34.2\" \"MTH:NOCODE\" \"ICPC2ICD10ENG:MTHU038700\" \"SNOMEDCT_US:186747009\" \"MESH:D018352\" \"ICD10:B34.2\" \"SNOMEDCT_US:187467005\")")
+    ("id" . "UMLS:C0206750")
+    ("umls_type" . "(\"T047\")")))
+
+  (semmed
+   10750
+   "UMLS:C0206750"
+   "Coronavirus Infections"
+   (7 . "disease_or_phenotypic_feature")
+   (("umls_type_label" . "(\"Disease or Syndrome\")")
+    ("xrefs"
+     .
+     "(\"RCD:AyuDC\" \"MDR:10051905\" \"CHV:0000021065\" \"LCH_NW:sh90004313\" \"RCDSY:AyuDC\" \"ICD10CM:B34.2\" \"RCD:A795.\" \"MDR:10053983\" \"MEDCIN:318393\" \"NDFRT:N0000003799\" \"ICD10AM:B34.2\" \"MTH:NOCODE\" \"ICPC2ICD10ENG:MTHU038700\" \"SNOMEDCT_US:186747009\" \"MESH:D018352\" \"ICD10:B34.2\" \"SNOMEDCT_US:187467005\")")
+    ("id" . "UMLS:C0206750")
+    ("umls_type" . "(\"T047\")")))
+
+  (semmed
+   80484
+   "UMLS:C0246449"
+   "M protein, Coronavirus"
+   (6 . "protein")
+   (("umls_type_label" . "(\"Amino Acid, Peptide, or Protein\")")
+    ("xrefs" . "(\"MESH:C067997\")")
+    ("id" . "UMLS:C0246449")
+    ("umls_type" . "(\"T116\")")))
+
+  (semmed
+   163024
+   "UMLS:C0255554"
+   "glycoprotein 6b, coronavirus"
+   (6 . "protein")
+   (("umls_type_label" . "(\"Amino Acid, Peptide, or Protein\")")
+    ("xrefs" . "(\"MESH:C087632\")")
+    ("id" . "UMLS:C0255554")
+    ("umls_type" . "(\"T116\")")))
+
+  (semmed
+   120934
+   "UMLS:C0255558"
+   "nonstructural protein, coronavirus"
+   (6 . "protein")
+   (("umls_type_label" . "(\"Amino Acid, Peptide, or Protein\")")
+    ("xrefs" . "(\"MESH:C087633\")")
+    ("id" . "UMLS:C0255558")
+    ("umls_type" . "(\"T116\")")))
+
+  (semmed
+   99446
+   "UMLS:C0369034"
+   "Coronavirus antibody"
+   (0 . "biological_entity")
+   (("umls_type_label"
+     .
+     "(\"Amino Acid, Peptide, or Protein\" \"Immunologic Factor\")")
+    ("xrefs"
+     .
+     "(\"LNC:MTHU022123\" \"SNOMEDCT_US:120814005\" \"LNC:LP37778-5\")")
+    ("id" . "UMLS:C0369034")
+    ("umls_type" . "(\"T116\" \"T129\")")))
+
+  (semmed
+   94819
+   "UMLS:C0389916"
+   "nucleocapsid protein, Coronavirus"
+   (6 . "protein")
+   (("umls_type_label"
+     .
+     "(\"Nucleic Acid, Nucleoside, or Nucleotide\" \"Amino Acid, Peptide, or Protein\")")
+    ("xrefs" . "(\"MESH:C099602\")")
+    ("id" . "UMLS:C0389916")
+    ("umls_type" . "(\"T114\" \"T116\")")))
+
+  (semmed
+   56157
+   "UMLS:C0528529"
+   "3C-like proteinase, Coronavirus"
+   (6 . "protein")
+   (("umls_type_label" . "(\"Amino Acid, Peptide, or Protein\" \"Enzyme\")")
+    ("xrefs" . "(\"MESH:C099456\")")
+    ("id" . "UMLS:C0528529")
+    ("umls_type" . "(\"T116\" \"T126\")")))
+  (semmed
+   149288
+   "UMLS:C0766211"
+   "glycoprotein 3b, coronavirus"
+   (6 . "protein")
+   (("umls_type_label" . "(\"Amino Acid, Peptide, or Protein\")")
+    ("xrefs" . "(\"MESH:C118611\")")
+    ("id" . "UMLS:C0766211")
+    ("umls_type" . "(\"T116\")")))
+
+  (semmed
+   122154
+   "UMLS:C0805362"
+   "Bovine coronavirus Ag"
+   (4 . "chemical_substance")
+   (("umls_type_label" . "(\"Immunologic Factor\")")
+    ("xrefs"
+     .
+     "(\"SNOMEDCT_US:709225000\" \"LNC:MTHU009322\" \"LNC:LP37387-5\")")
+    ("id" . "UMLS:C0805362")
+    ("umls_type" . "(\"T129\")")))
+  (semmed
+   77060
+   "UMLS:C0882751"
+   "Canine coronavirus Ab"
+   (0 . "biological_entity")
+   (("umls_type_label"
+     .
+     "(\"Amino Acid, Peptide, or Protein\" \"Immunologic Factor\")")
+    ("xrefs" . "(\"LNC:LP37510-2\" \"LNC:MTHU011428\")")
+    ("id" . "UMLS:C0882751")
+    ("umls_type" . "(\"T116\" \"T129\")")))
+  (semmed
+   156401
+   "UMLS:C0883053"
+   "Feline coronavirus Ab"
+   (0 . "biological_entity")
+   (("umls_type_label"
+     .
+     "(\"Amino Acid, Peptide, or Protein\" \"Immunologic Factor\")")
+    ("xrefs" . "(\"LNC:MTHU011458\" \"LNC:LP38135-7\")")
+    ("id" . "UMLS:C0883053")
+    ("umls_type" . "(\"T116\" \"T129\")")))
+  (semmed
+   136745
+   "UMLS:C0883321"
+   "Porcine respiratory coronavirus Ag"
+   (0 . "biological_entity")
+   (("umls_type_label"
+     .
+     "(\"Amino Acid, Peptide, or Protein\" \"Immunologic Factor\")")
+    ("xrefs" . "(\"LNC:LP39470-7\" \"LNC:MTHU011212\")")
+    ("id" . "UMLS:C0883321")
+    ("umls_type" . "(\"T116\" \"T129\")")))
+  (semmed
+   160691
+   "UMLS:C0883460"
+   "Canine coronavirus Ag"
+   (0 . "biological_entity")
+   (("umls_type_label"
+     .
+     "(\"Amino Acid, Peptide, or Protein\" \"Immunologic Factor\")")
+    ("xrefs"
+     .
+     "(\"LNC:LP37511-0\" \"SNOMEDCT_US:709320007\" \"LNC:MTHU011430\")")
+    ("id" . "UMLS:C0883460")
+    ("umls_type" . "(\"T116\" \"T129\")")))
+  (semmed
+   89842
+   "UMLS:C1433062"
+   "3C-like protease, SARS coronavirus"
+   (6 . "protein")
+   (("umls_type_label" . "(\"Amino Acid, Peptide, or Protein\" \"Enzyme\")")
+    ("xrefs" . "(\"MESH:C479931\")")
+    ("id" . "UMLS:C1433062")
+    ("umls_type" . "(\"T116\" \"T126\")")))
+  (semmed
+   118805
+   "UMLS:C1452735"
+   "3a protein, severe acute respiratory syndrome coronavirus"
+   (0 . "biological_entity")
+   (("umls_type_label"
+     .
+     "(\"Biologically Active Substance\" \"Amino Acid, Peptide, or Protein\")")
+    ("xrefs" . "(\"MESH:C487105\")")
+    ("id" . "UMLS:C1452735")
+    ("umls_type" . "(\"T116\" \"T123\")")))
+  (semmed
+   75229
+   "UMLS:C1570531"
+   "E protein, SARS coronavirus"
+   (0 . "biological_entity")
+   (("umls_type_label"
+     .
+     "(\"Biologically Active Substance\" \"Amino Acid, Peptide, or Protein\")")
+    ("xrefs" . "(\"MESH:C501689\")")
+    ("id" . "UMLS:C1570531")
+    ("umls_type" . "(\"T116\" \"T123\")")))
+  (semmed
+   97349
+   "UMLS:C0174990"
+   "coronavirus receptor"
+   (0 . "biological_entity")
+   (("umls_type_label" . "(\"Amino Acid, Peptide, or Protein\" \"Receptor\")")
+    ("xrefs" . "(\"MESH:C078034\")")
+    ("id" . "UMLS:C0174990")
+    ("umls_type" . "(\"T116\" \"T192\")"))))))
+|#
