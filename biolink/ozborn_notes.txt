@@ -9,3 +9,11 @@
  (define input-file
 -  (open-input-file "/home/mjpatton/PhD/CaseReviews/test_prototype_files/pmi_case_record_template_test1.csv"))
 +  (open-input-file input/path)
+
+
+
+
+
+Notes from Mike Patton
+(find-concepts #t  (list " ")
+

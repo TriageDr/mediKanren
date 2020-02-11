@@ -4,7 +4,8 @@
                semmed
                orange
                robokop
-               rtx
+               ;; rtx
+               rtx2
                ))
 
  (query-results.write-to-file?  . #t)  ;; #t will write the query and results to file, #f will not

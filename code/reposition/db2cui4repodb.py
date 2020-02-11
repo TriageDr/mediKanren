@@ -50,11 +50,18 @@ for drugcode in dblist:
             print(drugcode+' failed to find code match in UMLS, trying exact match with '+missingstr)
             cursor.execute("SELECT DISTINCT(CUI),STR,SAB FROM MRCONSO WHERE SAB LIKE 'RXNORM%' AND STR=%s", (missingstr,))
             #cursor.execute("SELECT DISTINCT(CUI),STR,SAB FROM MRCONSO WHERE STR=%s", (missingstr,))
+            matchcount=0
             for cui,text,source in cursor:
                 print(missingstr+': '+cui+' - '+text+' in source:'+source)
                 cuis.append(cui)
                 drgstr.append(missingstr)
+                matchcount=1
                 break
+            if(matchcount==0):
+                print('Could not find exact match for '+drugcode)
+                cuis.append('CUI-less-'+drugcode)
+                drgstr.append(missingstr)
+
 
 print('Length of drug ids from repoDB:'+str(len(dblist)))
 print('Length of cuis column is:'+str(len(cuis)))
@@ -63,4 +70,4 @@ print('Length of drgstr column is:'+str(len(drgstr)))
 repodf['DrugCUI']=cuis
 repodf['DrugString']=drgstr
 
-repodf
+repodf.to_csv('repodbCUImap.txt',index=False,sep='\t') 
