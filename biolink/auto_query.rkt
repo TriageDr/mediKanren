@@ -12,11 +12,19 @@
          csv-records)
 
 #|CSV INPUT-FILE WITH SPECIFIC HEADERS REQUIRED FOR AUTOMATED MK-QUERIES|#
+<<<<<<< HEAD
 
 (define input/path
   "/Users/michaelpatton/git/automated_medikanren_queries/auto_query_template.csv" )
 (define input-file
   (open-input-file "/Users/michaelpatton/git/automated_medikanren_queries/auto_query_template.csv" ))
+=======
+(define input/path
+  "/home/mjpatton/PhD/CaseReviews/test_prototype_files/01_23_2020_template_spark.csv")
+
+(define input-file
+  (open-input-file "/home/mjpatton/PhD/CaseReviews/test_prototype_files/01_23_2020_template_spark.csv"))
+>>>>>>> 6aae378a785a212b3ee3fa6c87217c4663182ee4
 
 (define header-expected
   "record_id,phenotype_or_symptom,phenotype_or_symptom_id,drug_or_medication,drug_or_medication_id,diagnosis_or_disease,diagnosis_or_disease_id,genetic_variant_symbol,genetic_variant_id")
@@ -253,9 +261,13 @@
       (else
        (prune-xrefs (cdr ls) (cons (car ls) els)))))) 
 
+<<<<<<< HEAD
 ;;removing get-assoc-value semmed to see how rtx2 behaves
 ;;here
 #|
+=======
+;;here 
+>>>>>>> 6aae378a785a212b3ee3fa6c87217c4663182ee4
 (define get-concept-xrefs
   (lambda (query-ls els)
     (cond
@@ -268,13 +280,18 @@
        (match (car query-ls)
               [`(,db ,cui ,id ,name ,category ,properties-list)
                (get-concept-xrefs (cdr query-ls)
+<<<<<<< HEAD
                                   (cons
+=======
+                                  (set-union
+>>>>>>> 6aae378a785a212b3ee3fa6c87217c4663182ee4
                                    (list id name
                                          (get-xrefs orange-concept-key/same-as properties-list)
                                          (get-xrefs orange-concept-key/synonym properties-list)
                                          (get-xrefs semmed-concept-key/xrefs properties-list)
                                          (get-xrefs robokop-concept-key/eq-id properties-list)
                                          (get-assoc-value semmed-concept-key/id properties-list)) els))])))))
+<<<<<<< HEAD
 |#
 ;; rtx2 has a [] in the synonym . value part of the assoc-list
 ;; using get-assoc on synonym to get full list 
@@ -300,6 +317,8 @@
 
 ;; create function to split out [] string ids from rtx2
 
+=======
+>>>>>>> 6aae378a785a212b3ee3fa6c87217c4663182ee4
 
 (define get-rxnorm
   (lambda (ls els)
@@ -419,7 +438,11 @@
                            drug-id
                            (get-xrefs semmed-concept-key/xrefs drug-props-assoc)
                            (get-xrefs orange-concept-key/same-as drug-props-assoc)
+<<<<<<< HEAD
                            (get-assoc-value orange-concept-key/synonym drug-props-assoc)
+=======
+                           (get-xrefs orange-concept-key/synonym drug-props-assoc)
+>>>>>>> 6aae378a785a212b3ee3fa6c87217c4663182ee4
                            (get-xrefs robokop-concept-key/eq-id drug-props-assoc)
                            (get-assoc-value semmed-concept-key/id drug-props-assoc))) "#f" "NA")) '())) '()))
               pred
@@ -432,7 +455,10 @@
                       (string-append PUBMED_URL_PREFIX (~a pubmed)))
                     (pubmed-ids-from-edge-props pred-props-assoc)) " ")) '() "NA") els) record-id)])))))
 
+<<<<<<< HEAD
 ;; changed get-xrefs orange-concept-key/synonym to get-assoc-value do to [] in 
+=======
+>>>>>>> 6aae378a785a212b3ee3fa6c87217c4663182ee4
 (newline)
 (displayln "HELPER-FUNCTIONS LOADED, BEGINNING GENE-CONCEPT BUILDING")
 (newline)
@@ -696,7 +722,10 @@
                 " wt Allele"))
           
           #|CREATE EXPORT DIRECTORY|#
+<<<<<<< HEAD
           
+=======
+>>>>>>> 6aae378a785a212b3ee3fa6c87217c4663182ee4
           (define directory/path
             (format "~a~a_~a_~a/" export-path export-date pmi-case-number-ls genetic_variant-name-ls))          
 
@@ -740,7 +769,11 @@
           
           (define TARGET-CONCEPT-->ALLp-->GENEc<--ALLp<--ALLc/port
             (open-output-file TARGET-CONCEPT-->ALLp-->GENEc<--ALLp<--ALLc/path  #:exists 'can-update))
+<<<<<<< HEAD
 
+=======
+          
+>>>>>>> 6aae378a785a212b3ee3fa6c87217c4663182ee4
           (displayln "PMI-CASE-NUMBER")
           (pretty-print pmi-case-number-ls)
 
@@ -750,6 +783,7 @@
           (displayln "GENETIC-VARIANT-SYMBOL")
           (pretty-print genetic_variant-curie-ls)
           
+<<<<<<< HEAD
           (define extract-name/curie-from-concept
             (lambda (query-ls els)
               (cond
@@ -945,10 +979,192 @@
                 ((or (void? (car query-ls))
                      (boolean? (car query-ls)))
                  (extract-curie-from-concept-ls
+=======
+          (define hgnc-symbol/id-pair
+            (lambda (ls1 ls2 els)
+              (cond
+                ((and (null? ls1)
+                      (null? ls2))
+                 els)
+                (else
+                 (hgnc-symbol/id-pair
+                  (cdr ls1) (cdr ls2)
+                  (cons
+                   (cons (car ls1)
+                         (car ls2)) els))))))
+          
+          (define hgnc-symbol/pair-from-input
+            (hgnc-symbol/id-pair
+             (list genetic_variant-name-ls)
+             (list genetic_variant-curie-ls) '()))
+ 
+          (displayln "HGNC SYMBOL/ID FROM INPUT FORM:")
+          (pretty-print hgnc-symbol/pair-from-input)
+
+          (define get-hgnc-symbol-string
+            (lambda (ls)
+              (cond 
+                ((null? ls) '())
+                ((or (boolean? (car ls))
+                     (void? (car ls)))
+                 (get-hgnc-symbol-string
+                  (cdr ls)))
+                (else 
+                 (query-hgnc-curie-for-hgnc-symbol ls '())))))
+          
+          (define hgnc-symbol-string
+            (get-hgnc-symbol-string
+             (list genetic_variant-curie-ls)))
+
+          (define get-hgnc-symbol-with-umls-suffix
+            (lambda (ls els)
+              (cond
+                ((null? ls) els)
+                ((or (boolean? (car ls))
+                     (void? (car ls)))
+                 (get-hgnc-symbol-with-umls-suffix
+                  (cdr ls) els))
+                (else
+                 (get-hgnc-symbol-with-umls-suffix
+                  (cdr ls)
+                  (set-union  
+                   (flatten
+                    (list
+                     (map (lambda (ls)
+                            (string-append ls umls-gene-concept-suffix))
+                          ls)
+                     (map (lambda (ls)
+                            (string-append ls umls-protein-concept-suffix))
+                          ls)
+                     (map (lambda (ls)
+                            (string-append ls umls-wt-Allele-concept-suffix))
+                          ls))) els))))))
+
+          (define hgnc-symbol-with-umls-suffix
+            (get-hgnc-symbol-with-umls-suffix
+             hgnc-symbol-string '()))
+          
+          #|(newline)
+          (displayln "hgnc-symbol-with-umls-suffix")
+          (pretty-print hgnc-symbol-with-umls-suffix)
+          |#
+          
+          (define get-molecular-entity-concepts-from-hgnc
+            (lambda (ls els)
+              (cond
+                ((null? ls) els)
+                ((or (boolean? (car ls))
+                     (void? (car ls)))
+                 (get-molecular-entity-concepts-from-hgnc
+                  (cdr ls) els))
+                (else
+                 (get-molecular-entity-concepts-from-hgnc
+                  (cdr ls)
+                  (set-union (find-concepts #t (list (car ls))) els))))))          
+          
+          (define query-start/hgnc
+            (get-molecular-entity-concepts-from-hgnc
+             (list genetic_variant-curie-ls) '()))
+          
+          (displayln "query-start/hgnc")
+          (newline)
+          (pretty-print query-start/hgnc)
+
+          (define raw-concepts/hgnc
+            (get-concept-xrefs query-start/hgnc '()))
+
+          (define xrefs-from-hgnc
+            (remove-duplicates
+             (prune-xrefs
+              (get-concept-xrefs query-start/hgnc '()) '())))
+          
+          (newline)
+          (displayln "xrefs-from-hgnc")
+          (pretty-print xrefs-from-hgnc)
+          
+          (define get-gene-concepts-ls/curie-or-string
+            (lambda (ls els)
+              (cond
+                ((null? ls) els)
+                ((or (boolean? (car ls))
+                     (void? (car ls)))
+                 (get-gene-concepts-ls/curie-or-string
+                  (cdr ls) els))
+                ((string-contains? (car ls) ":")
+                 (get-gene-concepts-ls/curie-or-string
+                  (cdr ls)
+                  (set-union
+                   (find-concepts #t (list (car ls))) els)))
+                ((string-contains? (car ls) "Allele")
+                 (get-gene-concepts-ls/curie-or-string
+                  (cdr ls)
+                  (set-union
+                   (find-concepts/options #f #f 0 #f (list (car ls))) els)))
+                (else
+                 (get-gene-concepts-ls/curie-or-string
+                  (cdr ls)
+                  els)))))
+          
+          (define get-gene-concepts-ls/from-curies
+            (lambda (ls els)
+              (cond
+                ((null? ls) els)
+                ((or (void? (car ls))
+                     (boolean? (car ls)))
+                 (get-gene-concepts-ls/from-curies
+                  (cdr ls)
+                  els))
+                (else
+                 (get-gene-concepts-ls/from-curies
+                  (cdr ls)
+                  (set-union
+                   (find-concepts #t (list (car ls))) els))))))
+
+          (define gene-concepts-ls/from-curies
+            (get-gene-concepts-ls/from-curies
+             xrefs-from-hgnc '()))
+          
+          (define get-gene-concepts-ls/from-hgnc-symbol-string
+            (lambda (ls els)
+              (cond
+                ((null? ls) els)
+                ((or (void? (car ls))
+                     (boolean? (car ls)))
+                 (get-gene-concepts-ls/from-hgnc-symbol-string
+                  (cdr ls) els))
+                (else
+                 (get-gene-concepts-ls/from-hgnc-symbol-string
+                  (cdr ls)
+                  (set-union 
+                   (find-concepts/options #f #f 0 #f (list (car ls))) els))))))
+
+          (define gene-concepts-ls/from-hgnc-symbol-string
+            (get-gene-concepts-ls/from-hgnc-symbol-string
+             hgnc-symbol-string '()))     
+                 
+          (define filtered-gene-concepts-from-fuzzy-string-search
+            (filter-umls-string-concepts
+             gene-concepts-ls/from-hgnc-symbol-string
+             hgnc-symbol-with-umls-suffix
+             '()))
+
+          (define gene-concept-ls
+            (append filtered-gene-concepts-from-fuzzy-string-search
+                    gene-concepts-ls/from-curies))
+
+          (define extract-name/curie-from-concept
+            (lambda (query-ls els)
+              (cond
+                ((null? query-ls) els)
+                ((or (void? (car query-ls))
+                     (boolean? (car query-ls)))
+                 (extract-name/curie-from-concept
+>>>>>>> 6aae378a785a212b3ee3fa6c87217c4663182ee4
                   (cdr query-ls) els))
                 (else 
                  (match (car query-ls)
                    [`(,db ,cui ,id ,name ,category ,properties-list)
+<<<<<<< HEAD
                     (extract-curie-from-concept-ls
                      (cdr query-ls)
                      (cons
@@ -989,6 +1205,16 @@
               "drugbank_fda_status" "rxnorm_id" "potential_therapeutic"
               "predicate" "predicate_sign" "target_object_name" "target_object_id" "number_of_pubmeds"
               "pubmed_urls"))
+=======
+                    (extract-name/curie-from-concept
+                     (cdr query-ls)
+                     (cons
+                      (list db name id) els))])))))
+          
+          (displayln "HGNC-ID DERIVED CONCEPTS:")
+          (newline)
+          (pretty-print (extract-name/curie-from-concept gene-concept-ls '()))
+>>>>>>> 6aae378a785a212b3ee3fa6c87217c4663182ee4
           
           (define insert-at
             (lambda (pos elmt ls)
@@ -1005,15 +1231,43 @@
                  (cons (car ls)
                        (insert-at
                         (- pos 1) elmt (cdr ls)))))))
+<<<<<<< HEAD
           
+=======
+                    
+>>>>>>> 6aae378a785a212b3ee3fa6c87217c4663182ee4
           (define insert-therapeutic-drug-flag
             (lambda (ls)
               (if (or (not (equal? "NA" (list-ref ls 5)))
                       (not (equal? "NA" (list-ref ls 6))))
                   (insert-at 7 "YES" ls)
                   (insert-at 7 "ND" ls))))
+<<<<<<< HEAD
                     
 	  (define ALLc-->ALLp-->TARGET-CONCEPT/export-edges
+=======
+          
+          (match-define
+	   (list ALLc-->ALLp-->TARGET-CONCEPT=>concepts ALLc-->ALLp-->TARGET-CONCEPT=>edges)
+	   (time
+	    (run/graph
+	     ((ALL (find-categories (list ""))) 
+              (gene-concept-ls gene-concept-ls))
+             ((ALL-> (find-predicates (list ""))))
+	     (ALL ALL-> gene-concept-ls))))
+       
+	  (define ALLc-->ALLp-->TARGET-CONCEPT/edges (hash-ref ALLc-->ALLp-->TARGET-CONCEPT=>edges 'ALL->))
+          (define ALLc-->ALLp-->TARGET-CONCEPT/concepts
+            (remove-duplicates (hash-ref ALLc-->ALLp-->TARGET-CONCEPT=>concepts 'ALL)))
+
+          (define COLUMN-HEADERS_SUBJECT->PREDICATE->OBJECT
+            '("record_id" "knowledge_graph" "subject_name" "subject_id" "umls_category"
+              "drugbank_fda_status" "rxnorm_id" "potential_therapeutic"
+              "predicate" "predicate_sign" "target_object_name" "target_object_id" "number_of_pubmeds"
+              "pubmed_urls"))
+                    
+	  (define ALL->ALLPRED->TARGET-CONCEPT/export-edges
+>>>>>>> 6aae378a785a212b3ee3fa6c87217c4663182ee4
 	    (time
              (map insert-therapeutic-drug-flag
                   (remove-duplicates
@@ -1026,6 +1280,7 @@
            ALLc-->ALLp-->TARGET-CONCEPT/path)
 
 	  (outer-loop
+<<<<<<< HEAD
            ALLc-->ALLp-->TARGET-CONCEPT/export-edges
            ALLc-->ALLp-->TARGET-CONCEPT/port)
 
@@ -1058,6 +1313,10 @@
 	  (outer-loop
            TARGET-CONCEPT-->ALLp-->ALLc/export-edges
            TARGET-CONCEPT-->ALLp-->ALLc/port)
+=======
+           ALL->ALLPRED->TARGET-CONCEPT/export-edges
+           ALLc-->ALLp-->TARGET-CONCEPT/port) 
+>>>>>>> 6aae378a785a212b3ee3fa6c87217c4663182ee4
 
           #|
           (newline)
@@ -1077,14 +1336,23 @@
            (format "DIAGNOSIS NAMES & CURIE-IDS FOR ~a:\n\nNAME(S): ~a\n\nCURIE(S): ~a" pmi-case-number-ls
                    diagnosis-name-ls diagnosis-curie-ls))
           (newline)
+<<<<<<< HEAD
           
+=======
+          |#
+          
+          (newline) 
+>>>>>>> 6aae378a785a212b3ee3fa6c87217c4663182ee4
           (displayln
            (format "GENE VARIANT NAMES & CURIE-IDS FOR ~a:\n\nNAME(S): ~a \n\nCURIE(S): ~a" pmi-case-number-ls
                    genetic_variant-name-ls genetic_variant-curie-ls))
           (newline)
+<<<<<<< HEAD
           |#
           
           #|
+=======
+>>>>>>> 6aae378a785a212b3ee3fa6c87217c4663182ee4
 
           (define ALLc-->ALLp-->TARGET-CONCEPT/xrefs
             (get-concept-xrefs
@@ -1376,9 +1644,13 @@
 	  (outer-loop
            gene->ALLPRED->ALL-molecular-entity-regulator<-ALLPRED-<ALL/export-edges
            TARGET-CONCEPT-->ALLp-->GENEc<--ALLp<--ALLc/port)
+<<<<<<< HEAD
          |#
 
           
+=======
+
+>>>>>>> 6aae378a785a212b3ee3fa6c87217c4663182ee4
           (newline)
           (displayln (format "CASE COMPLETE:~a" pmi-case-number-ls))
           (newline)
@@ -1387,6 +1659,7 @@
 
 (start-function record-assoc-ls)
 
+<<<<<<< HEAD
 
 
 #|
@@ -1588,3 +1861,5 @@
           (pretty-print (extract-name/curie-from-concept gene-concept-ls '()))
 
           |#
+=======
+>>>>>>> 6aae378a785a212b3ee3fa6c87217c4663182ee4
