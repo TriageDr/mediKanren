@@ -1,0 +1,36 @@
+#!/bin/bash
+# Alzheimer Gene List
+
+#(define alzheimer-gene-list
+# (map symbol->string
+#      '(HGNC:1052
+#        HGNC:2095
+#        HGNC:613
+#        HGNC:37
+#        HGNC:2334
+#        HGNC:15514
+#        HGNC:13375
+#        HGNC:1659
+#        HGNC:14284
+#        HGNC:14258
+#        HGNC:620
+#        HGNC:6893
+#        HGNC:9508
+#        HGNC:9509
+#        HGNC:17761)))
+
+#nohup racket gene-to-drug-rank.rkt HGNC:6871 > alz/HGNC:6871run.txt &
+#nohup racket gene-to-drug-rank.rkt HGNC:6292 > alz/HGNC:6292run.txt &
+
+#nohup racket gene-to-drug-rank.rkt HGNC:1052 > alz/HGNC:1052run.txt &
+nohup racket gene-to-drug-rank.rkt HGNC:2095 > alz/HGNC:2095run.txt &
+#nohup racket gene-to-drug-rank.rkt HGNC:613 > alz/HGNC:613run.txt &
+#nohup racket gene-to-drug-rank.rkt HGNC:2334 > alz/HGNC:2334run.txt &
+#nohup racket gene-to-drug-rank.rkt HGNC:15514 > alz/HGNC:15514run.txt &
+#nohup racket gene-to-drug-rank.rkt HGNC:13375 > alz/HGNC:13375run.txt &
+#nohup racket gene-to-drug-rank.rkt HGNC:14284 > alz/HGNC:14284run.txt &
+#nohup racket gene-to-drug-rank.rkt HGNC:620 > alz/HGNC:620run.txt &
+#nohup racket gene-to-drug-rank.rkt HGNC:6893 > alz/HGNC:6893run.txt &
+#nohup racket gene-to-drug-rank.rkt HGNC:9508 > alz/HGNC:9508run.txt &
+#nohup racket gene-to-drug-rank.rkt HGNC:9509 > alz/HGNC:9509run.txt &
+#nohup racket gene-to-drug-rank.rkt HGNC:17761 > alz/HGNC:17761run.txt &

@@ -6,6 +6,7 @@
                orange
                robokop
                ;; rtx
+               ;;rtx2_old
                rtx2
                ))
  (cache-synonyms? . #t)

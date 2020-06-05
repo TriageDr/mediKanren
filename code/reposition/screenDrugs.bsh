@@ -1,0 +1,2 @@
+#!/bin/bash
+python ./filterByCuis.py /home/ozborn/code/repo/mediKanrenAutomatedQueries/May5_2020 /home/ozborn/code/repo/mediKanrenAutomatedQueries/May5_2020/filtered/

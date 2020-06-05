@@ -36,15 +36,18 @@ filter_dict = repodf['DrugCUI'].to_dict()
 filter_set = set(filter_dict.values())
 kwstr = '|'.join(sorted(filter_set))
 #print(len(filter_set))
-#print(kwstr)
+print(kwstr)
 
 # Build filter
 for root, dirs, files in os.walk(inputpath, topdown=False):
    for name in files:
       if(name.endswith("csv") or name.endswith("tsv")):
+        if("LIST" in name ):
+           continue
         filein=os.path.join(root, name)
+        print(filein)
         result = pd.read_csv((filein),encoding = 'utf-8',delimiter='\t')
-        #print(result.head(1))
+        print(result.head(1))
         if 'drug_id' in result:
            filterDF("drug_id",kwstr,result,outputpath+name)
         elif ('subject_curie' in result) and (name.find("DRUGS")!=-1):
